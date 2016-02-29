@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="23217" version="5.00">
+    <report:Settings RWPageWidth="9.50cm" RWPageLength="6.50cm" RWLeftMargin="0.50cm" RWTopMargin="0.50cm" RWRightMargin="0.50cm" RWBottomMargin="0.50cm">
+        <report:FormatList>
+            <report:Format-SVG/>
+            <report:Format-PDF/>
+            <report:Format-image/>
+        </report:FormatList>
+    </report:Settings>
+    <report:Data RWDataLocation="gre_qr_codes.rdd" RWFglReportName="report_name"/>
+    <report:Conflicts/>
+    <rtl:stylesheet>
+        <PXML>
+            <rtl:match name="Report" nameConstraint="Report" minOccurs="1" maxOccurs="1">
+                <rtl:match name="OnEveryRow" nameConstraint="OnEveryRow" minOccurs="0" maxOccurs="unbounded"/>
+                <MINIPAGE name="Page Root" width="max" length="min">
+                    <MINIPAGE name="MiniPage" width="max" length="max" borderWidth="1" borderStyle="solid">
+                        <WORDBOX name="WordBox" width="min" length="min" anchorX="0" anchorY="0" alignment="center" fontName="URW Chancery L" fontSize="45" baselineType="leftleft" floatingBehavior="enclosed" textAlignment="center" text="Off The Rails" trimText="both"/>
+                        <LAYOUTNODE name="LayoutNode" width="max" length="5" floatingBehavior="enclosed" borderTopStyle="double"/>
+                        <LAYOUTNODE name="LayoutNode2" x="5" width="min" length="max" layoutDirection="leftToRight" floatingBehavior="enclosed">
+                            <BARCODEBOX name="BarCodeBox1" anchorX="0" anchorY="0" floatingBehavior="enclosed" codeType="qr-code" codeValue="https://soundcloud.com/offtherailsduo"/>
+                            <WORDWRAPBOX name="WordWrapBox" width="min" length="min" alignment="baseline" fontName="Century Gothic" fontSize="10" floatingBehavior="enclosed" text="&#10; facebook.com/offtherailsduo" roundedCorners="false"/>
+                        </LAYOUTNODE>
+                        <LAYOUTNODE name="LayoutNode1" x="5" width="min" length="max" alignment="far" layoutDirection="leftToRight" floatingBehavior="enclosed">
+                            <rtl:input-variable name="m_text" type="FGLString" expectedLocation="expectedBefore"/>
+                            <BARCODEBOX name="BarCodeBox" anchorX="0" anchorY="0" floatingBehavior="enclosed" codeType="qr-code" codeValue="{{m_text}}"/>
+                            <WORDWRAPBOX name="WordWrapBox1" width="min" length="min" alignment="baseline" fontName="Century Gothic" fontSize="10" floatingBehavior="enclosed" text=" &#10; soundcloud.com/offtherailsduo" roundedCorners="false"/>
+                        </LAYOUTNODE>
+                    </MINIPAGE>
+                </MINIPAGE>
+            </rtl:match>
+        </PXML>
+    </rtl:stylesheet>
+</report:Report>

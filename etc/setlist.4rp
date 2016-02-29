@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="23217" version="5.00">
+    <report:Settings RWPageWidth="a4width" RWPageLength="a4length" RWLeftMargin="1.3cm" RWTopMargin="1.3cm" RWRightMargin="1.3cm" RWBottomMargin="1.3cm">
+        <report:FormatList>
+            <report:Format-SVG/>
+            <report:Format-PDF/>
+            <report:Format-image/>
+        </report:FormatList>
+    </report:Settings>
+    <report:Data RWDataLocation="setlist.rdd" RWFglReportName="report_name"/>
+    <report:Conflicts/>
+    <rtl:stylesheet>
+        <PXML>
+            <rtl:match name="Report" nameConstraint="Report" minOccurs="1" maxOccurs="1">
+                <MINIPAGE name="Page Root" width="max" length="max" borderWidth="1" borderStyle="solid">
+                    <LAYOUTNODE name="Page Header" width="max" length="min" port="anyPageHeader">
+                        <MINIPAGE name="StripeLayouter3" width="min" length="max" layoutDirection="leftToRight">
+                            <rtl:input-variable name="m_setlist_rec.name" type="FGLString" expectedLocation="expectedHere"/>
+                            <WORDBOX name="Report Title" x="0" y="10" width="max-20" length="40" anchorX="0" anchorY="0" alignment="baseline" fontName="URW Chancery L" fontSize="25" baselineType="leftleft" floatingBehavior="enclosed" textAlignment="center" text="{{m_setlist_rec.name}}"/>
+                        </MINIPAGE>
+                    </LAYOUTNODE>
+                    <rtl:match name="OnEveryRow" nameConstraint="OnEveryRow" minOccurs="0" maxOccurs="unbounded">
+                        <MINIPAGE name="Table Row" class="grwTableRow" width="40.25" length="max" layoutDirection="leftToRight">
+                            <WORDBOX name="Spacer_1" alignment="baseline" baselineType="leftleft" port="itemSeparator" text=" "/>
+                            <rtl:input-variable name="x" type="FGLNumeric" expectedLocation="expectedHere"/>
+                            <DECIMALFORMATBOX name="x Value" class="grwTableNumericColumnValue" width="{30}" anchorX="1" fontName="URW Chancery L" fontSize="14" floatingBehavior="enclosed" textAlignment="right" format="-----#." value="{{x}}"/>
+                            <rtl:input-variable name="l_song.titl" type="FGLString" expectedLocation="expectedHere"/>
+                            <WORDWRAPBOX name="l_song Value" class="grwTableStringColumnValue" width="450" fontName="URW Chancery L" fontSize="14" floatingBehavior="enclosed" text="{{l_song.titl}}"/>
+                            <rtl:input-variable name="l_song.artist" type="FGLString" expectedLocation="expectedHere"/>
+                            <WORDWRAPBOX name="l_info Value" class="grwTableStringColumnValue" x="18" y="62" width="400" anchorX="0" anchorY="0" fontName="URW Chancery L" fontSize="12" floatingBehavior="enclosed" text="{{l_song.artist}}"/>
+                        </MINIPAGE>
+                    </rtl:match>
+                </MINIPAGE>
+            </rtl:match>
+        </PXML>
+    </rtl:stylesheet>
+</report:Report>

@@ -1,0 +1,907 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ FOURJS_START_COPYRIGHT(D,2011)
+ Property of Four Js*
+ (c) Copyright Four Js 2011, 2015. All Rights Reserved.
+ * Trademark of Four Js Development Tools Europe Ltd
+   in the United States and elsewhere
+ 
+ This file can be modified by licensees according to the
+ product manual.
+ FOURJS_END_COPYRIGHT
+ -->
+<?gwc removeComments="true" filterUnchangedAttributes="true"?>
+<!DOCTYPE html>
+<html
+	gwc:define='
+		gDEV server/development;
+		kaInterval XPathConfig("/OUTPUT/MAP/TIMEOUT/USER_AGENT/text()");
+		win (application/ui/topmostNormalWindow || application/ui/window);
+		img resourceuri("img/", "SetHtml5");
+		layoutCharWidth 0.54;
+		internalStyle "native";
+		uaFeaturesString application/meta/variable["gwcUserAgentFeatures"];
+		uaFeatures split(uaFeaturesString, " ");
+		isTouch "isTouch" in uaFeatures;
+		isOrientable "isOrientable" in uaFeatures;
+		hasContextMenu "hasContextMenu" in uaFeatures;
+		hasFormValidation "hasFormValidation" in uaFeatures;
+		hasDnD "hasDnD" in uaFeatures;
+		hasVersatileSelectValue "hasVersatileSelectValue" in uaFeatures;
+		hasDatalist "hasDatalist" in uaFeatures;
+		hasInputRange "hasInputRange" in uaFeatures;
+		hasDateNative "hasDateNative" in uaFeatures;
+		hasTimeNative "hasTimeNative" in uaFeatures;
+		hasInputNumber "hasInputNumber" in uaFeatures;
+		hasFastUI "hasFastUI" in uaFeatures;
+		hasSmallScreen "hasSmallScreen" in uaFeatures;
+		hasMediumScreen "hasMediumScreen" in uaFeatures;
+		hasBigScreen "hasBigScreen" in uaFeatures;
+		hasContextMenu "hasContextMenu" in uaFeatures;
+		isIOS "isIOS" in uaFeatures;
+		isAndroid "isAndroid" in uaFeatures;
+		isIEMobile "isIEMobile" in uaFeatures;
+		isMobile isAndroid || isIOS || isIEMobile || isTouch &amp;&amp; hasSmallScreen;
+		topwin (application/ui/topmostNormalWindow);
+		traditionalMode (application/ui/uimode == "traditional" &amp;&amp; (!topwin || !topwin/form || topwin/form/screen));
+		title win ? (win/text ? win/text : win/name) : "Genero Application";
+		dialogOrMenu dialog || menu;
+		closeAction dialogOrMenu/action["close"];
+		hasModal application/ui/window &amp;&amp; (!application/ui/topmostNormalWindow || application/ui/topmostNormalWindow &amp;&amp; application/ui/window &amp;&amp; application/ui/topmostNormalWindow/name != application/ui/window/name);
+		closeActionDisabled (hasModal || !closeAction/isActive || window/style["windowOptionClose"] == "no")
+	'
+
+	xmlns='http://www.w3.org/1999/xhtml'
+	xmlns:gwc='http://www.4js.com/GWC'
+>
+	<head>
+		<meta
+			content='IE=edge'
+			http-equiv='x-ua-compatible'
+		/>
+
+		<title>{title}</title>
+
+		<meta
+			content='width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1'
+			name='viewport'
+		/>
+
+		<link
+			href='{resourceuri("css_normalize.css", "SetHtml5")}'
+			rel='stylesheet'
+			type='text/css'
+		/>
+
+		<link
+			href='{resourceuri("css_main.css", "SetHtml5")}'
+			rel='stylesheet'
+			type='text/css'
+		/>
+
+		<link
+			href='{resourceuri("css_layout.css", "SetHtml5")}'
+			rel='stylesheet'
+			type='text/css'
+		/>
+
+		<link
+			href='{resourceuri("css_theme.css", "SetHtml5")}'
+			rel='stylesheet'
+			type='text/css'
+		/>
+
+		<link
+			href='{resourceuri("css_customization.css", "SetHtml5")}'
+			rel='stylesheet'
+			type='text/css'
+		/>
+
+		<link href='{resourceuri("setlist_main.css", "njm_html5")}' rel='stylesheet' type='text/css' /> <!-- NJM -->
+
+		<link
+			href='{img}html5_gwc.ico'
+			rel='shortcut icon'
+		/>
+
+		<script>
+
+			var gDEV={gDEV};
+			var isTouch={isTouch};
+			var hasSmallScreen={hasSmallScreen};
+			var hasContextMenu={hasContextMenu};
+			var isIOS={isIOS};
+			var isAndroid={isAndroid};
+			var isIEMobile={isIEMobile};
+			var isMobile={isMobile};
+			var hasFastUI={hasFastUI};
+
+			var isGHC=false; /*this variable is set when a GHC app is launched */
+
+			// see data-g-loc attribute
+
+			var gwcLocalizedMessages = {{
+				'en':{{
+					unexpectedClosingWarningMessage: 'The Genero application is still running.\nIf you leave now, some data may be lost.\nPlease use the application user interface to exit the application before navigating away from this page.',
+					clickForDownload: 'Click here if the download doesn\'t start automatically.',
+					fileUploadConfirmation: 'Upload the file ?',
+					monthList: 'January,February,March,April,May,June,July,August,September,October,November,December',
+					dayList: 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+					decimalSeparator: '.',
+					'restore column sort':'Reset column sort',
+					'show all columns':'Show all columns',
+					'Stored settings':'Stored settings',
+					'Disable':'Disable',
+					'Read only':'Read only',
+					'Clear settings':'Clear settings',
+					'restore default settings':'Reset settings',
+					'Stored settings changed':'Stored settings have been changed. Please restart the application for changes to take effect.',
+					'Clear stored settings question':'Do you want to clear stored settings ? (Please restart the application for changes to take effect.)',
+					'freeze left':'Freeze to left',
+					'freeze right':'Freeze to right',
+					'unfreeze all':'Unfreeze all',
+					'hide all but selected':'Hide all but selected',
+					'network error':'The application is no longer available (error %1).'
+				},
+				'fr':{{
+					unexpectedClosingWarningMessage: 'L\'application Genero est en cours d\'ex&#xE9;cution.\nSi vous la quittez maintenant, certaines donn&#xE9;es pourraient &#xEA;tre perdues.\nVeuillez utiliser l\'interface utilisateur de l\'application pour quitter l\'application avant de quitter cette page.',
+					clickForDownload: 'Cliquez ici si le t&#xE9;l&#xE9;chargement ne d&#xE9;marre pas automatiquement.',
+					fileUploadConfirmation: 'T&#xE9;l&#xE9;charger le fichier ?',
+					monthList: 'Janvier,F&#xE9;vrier,Mars,Avril,Mai,Juin,Juillet,Ao&#xFB;t,Septembre,Octobre,Novembre,D&#xE9;cembre',
+					dayList: 'Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi',
+					decimalSeparator: ',',
+					'restore column sort':'R&#xE9;tablir le tri des colonnes',
+					'show all columns':'Voir toutes les colonnes',
+					'Stored settings':'Paramètres m&#xE9;moris&#xE9;s',
+					'Disable':'D&#xE9;sactiv&#xE9;s',
+					'Read only':'Non-modifi&#xE9;s',
+					'Clear settings':'Remettre &#xE0; zero',
+					'restore default settings':'Restaurer les r&#xE9;glages par d&#xE9;faut',
+					'Stored settings changed':'Les paramètres m&#xE9;moris&#xE9;s ont &#xE9;t&#xE9; modifi&#xE9;s. Veuillez red&#xE9;marrer l\'application pour les prendre en compte.',
+					'Clear stored settings question':'Voulez-vous effacer les paramètres m&#xE9;moris&#xE9;s ? (Veuillez red&#xE9;marrer l\'application pour prendre en compte la suppression.)',
+					'freeze left':'Fixer &#xE0; gauche',
+					'freeze right':'Fixer &#xE0; droite',
+					'unfreeze all':'Ne plus fixer',
+					'hide all but selected':'Cacher les autres colonnes',
+					'network error':'L\'application n\'est plus accessible (erreur %1).'
+				},
+				'es':{{
+					unexpectedClosingWarningMessage: 'La aplicaci&#xF3;n Genero sigue ejecutando.\nSi se va ahora, algunos datos pueden perderse.\nUtilice la interfaz de usuario de la aplicaci&#xF3;n para salir de la aplicaci&#xF3;n antes de salir de esta p&#xE1;gina.',
+					clickForDownload: 'Haga clic aqu&#xED; si la descarga no se inicia autom&#xE1;ticamente.',
+					fileUploadConfirmation: 'Subir el archivo ?',
+					monthList: 'Enero,Febrero,Marzo,Abril,Mayo,Junio,Julio,Agosto,Septiembre,Octubre,Noviembre,Diciembre',
+					dayList: 'Domingo,Lunes,Martes,Mi&#xE9;rcoles,Jueves,Viernes,S&#xE1;bado',
+					decimalSeparator: ',',
+					'restore column sort':'Restaurar orden de las columnas',
+					'show all columns':'Mostrar todas las columnas',
+					'Stored settings':'Ajustes almacenados',
+					'Disable':'Deshabilitar',
+					'Clear settings':'Limpiar ajustes',
+					'Read only':'S&#xF3;lo lectura',
+					'restore default settings':'Restaurar configuraci&#xF3;n predeterminada',
+					'Stored settings changed':'Los ajustes almacenados han sido modificados. Por favor, reinicie la aplicaci&#xF3;n para que los cambios tengan efecto.',
+					'Clear stored settings question':'Desea limpiar los ajustes almacenados ? (Por favor, reinicie la aplicaci&#xF3;n para que los cambios tengan efecto.)',
+					'freeze left':'Fijar a izquierda',
+					'freeze right':'Fijar a derecha',
+					'unfreeze all':'No fijar m&#xE1;s',
+					'hide all but selected':'Esconder las otras columnas',
+					'network error':'La aplicaci&#xF3;n no est&#xE1; mas disponible (error %1).'
+				},
+				'pt':{{
+					unexpectedClosingWarningMessage: 'A aplica&#xE7;&#xE3;o Genero ainda est&#xE1; em execu&#xE7;&#xE3;o.\nSe voc&#xEA; sair agora, alguns dados podem ser perdidos.\nPor favor, use a interface de usu&#xE1;rio do aplicativo para sair da aplica&#xE7;&#xE3;o antes de navegar para fora desta p&#xE1;gina.',
+					clickForDownload: 'Clique aqui se o download n&#xE3;o come&#xE7;ar automaticamente.',
+					fileUploadConfirmation: 'Subir o arquivo ?',
+					monthList: 'Janeiro,Fevereiro,Mar&#xE7;o,Abril,Maio,Junho,Julho,Agosto,Setembro,Outubro,Novembro,Dezembro',
+					dayList: 'Domingo,Segunda,Ter&#xE7;a,Quarta,Quinta,Sexta,S&#xE1;bado',
+					decimalSeparator: ',',
+					'restore column sort':'Redefinir ordem das colunas',
+					'show all columns':'Mostrar todas as colunas',
+					'Stored settings':'Configura&#xE7;&#xF5;es armazenadas',
+					'Disable':'Desativar',
+					'Read only':'Somente leitura',
+					'Clear settings':'Limpar configura&#xE7;&#xF5;es',
+					'restore default settings':'Redefinir configura&#xE7;&#xF5;es padr&#xF5;es',
+					'Stored settings changed':'Configura&#xE7;&#xF5;es armazenadas foram alteradas. Por favor, reinicie o aplicativo para que as altera&#xE7;&#xF5;es entrem em vigor.',
+					'Clear stored settings question':'Deseja limpar as configura&#xE7;&#xF5;es armazenadas ? (Por favor, reinicie o aplicativo para que as altera&#xE7;&#xF5;es entrem em vigor.)',
+					'freeze left':'Congelar para a esquerda',
+					'freeze right':'Congelar para a direita',
+					'unfreeze all':'Descongelar todas',
+					'hide all but selected':'Esconder as outras colunas',
+					'network error':'A aplica&#xE7;&#xE3;o j&#xE1; n&#xE3;o est&#xE1; dispon&#xED;vel (erro %1).'
+				},
+				'de':{{
+					unexpectedClosingWarningMessage: 'Die Genero Anwendung its noch aktiv.\nWhen Sie die Seite schließen, können Daten verloren gehen.\nBitte benutzen Sie eine Aktion in der grafischen Benutzeroberfläche, um die Anwendung zu beenden.',
+					clickForDownload: 'Klicken Sie hier , wenn der Download nicht automatisch startet.',
+					fileUploadConfirmation: 'Datei hochladen?',
+					monthList: 'Januar,Februar,März,April,May,Juni,Juli,August,September,October,November,December',
+					dayList: 'Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,Freitag,Sonnabend',
+					decimalSeparator: ',',
+					'restore column sort':'Sortierung abschalten',
+					'show all columns':'Alle Spalten zeigen',
+					'Stored settings':'Gespeicherte Einstellungen',
+					'Disable':'Deaktivieren',
+					'Read only':'Schreibgeschützt',
+					'Clear settings':'Einstellungen löschen',
+					'restore Default settings':'Standardwerte für die Einstellungen',
+					'Stored settings changed':'Die Einstellungen haven sich geändert, bitte Neustart der Anwendung, um die Einstellungen einzulesen.',
+					'Clear stored settings question':'Einstellungen löschen ? (Bitte Neustart der Anwendung um die Änderungen zu sehen.)',
+					'freeze left':'Spalten nach links "festhalten"',
+					'freeze right':'Spalten nach rechts "festhalten"',
+					'unfreie all':'Normale Sichtbarkeit der Spalten',
+					'hide all but selected':'Alle verstecken außer der selektierten',
+					'Network error':'Die Anwendung its nicht mehr verfügbar (Fehler %1).'
+				},
+			};
+
+			function gwcGetConfigurationObject() {{ // called once, by the csf.
+
+				return {{
+					getMessage: function(messageName) {{
+					
+						/// defines the default language. This is used if the user's language is not found.
+						var defaultLang = 'en';
+
+						/// gets the browser's language.
+						var lang = window.navigator.language || window.navigator.userLanguage || defaultLang;
+
+						/// transforms codes like "en-US" into "en".
+						lang = lang.substr(0,2);
+
+						/// if the language is not defined, use the default language instead.
+						var langSet = gwcLocalizedMessages[lang] || gwcLocalizedMessages[defaultLang];
+
+						/// if gwcLocalizedMessages is empty, the messageName is used as 2nd fallback.
+						return langSet[messageName] || gwcLocalizedMessages[defaultLang][messageName] || messageName;
+					},
+					backButtonActionName: 'browser_back', /// the name of the action that is triggered when the browser's back button is pressed
+					forwardButtonActionName: 'browser_forward', /// the name of the action that is triggered when the browser's forward button is pressed
+					handlePageReload: true,
+					handleClosingApplication: gDEV ? 1 : 0,  /// 0:ask the unexpectedClosingWarningMessage message, 1:tries to close silently (may fail)
+					httpRetryPeriod: {kaInterval},
+					sendLatency: 0,
+					rollbackWarningTimeout: gDEV ? 0 : 100, /// millisecond
+					rollbackWarningBeep: true,
+					rollbackWarningFlash: true
+				}
+			}
+		</script>
+
+		<script
+			src='{resourceuri("csf.js", "SetHtml5")}'
+		/>
+
+		<script
+			src='{resourceuri("components.js", "SetHtml5")}'
+		/>
+
+		<script
+			src='{resourceuri("gridlayout.js", "SetHtml5")}'
+		/>
+
+		<style
+			gwc:content='application/ui/StyleList ? application/ui/StyleList : ""'
+			type='text/css'
+		/>
+	</head>
+
+	<body
+		gwc:define='
+			uiError application/ui &amp;&amp; application/ui/error || null;
+			d dialog || menu;
+		'
+
+		id='gSStyle'
+
+		class='document-style {uaFeaturesString} {isMobile ? "isMobile" : ""}'
+
+		data-g-decimal-separator='{application/ui/decimalSeparator}'
+		data-g-dnd='{application/ui/dragdropinfo ? (application/ui/dragdropinfo/accepted ? "1" : "") + "," + (application/ui/dragdropinfo/feedback) + "," + (application/ui/dragdropinfo/operation) + "," + (application/ui/dragdropinfo/canmove ? "1" : "") + "," + (application/ui/dragdropinfo/cancopy ? "1" : "") : null}'
+		data-g-end='{application/state/ended || null}'
+		data-g-id='main'
+		data-g-input-wrap='{application/ui/inputwrap || null}'
+		data-g-interrupt-url='{application/interrupt/url}'
+		data-g-keepalive-interval='{kaInterval}'
+		data-g-keepalive-url='{document/keepaliveURL}'
+		data-g-launch='{application/meta/launch ? application/meta/launch/url : null}'
+        data-g-launchstartid='{application/meta/launch ? application/meta/launch/startid : null}'
+        data-g-launchcount='{application/meta/launch ? application/meta/launch/count : null}'
+		data-g-processing='{application/state/processing || null}'
+		data-g-ui-error='{uiError}'
+		data-g-url='{document/URL}'
+		data-g-title='{ title }'
+		data-g-qa-src='{resourceuri("qa.js", "SetHtml5")}'
+        data-g-applicationname='{application/ui/name}'
+
+	>
+		<noscript>
+			<h1>Your browser must support javascript.</h1>
+		</noscript>
+
+		<!--
+		========================================================================
+		Global Layout (gGridLayoutRoot)
+
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+ Header                                                          +
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+ Application Pane                                                +
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+ EndingPage Pane                                                 +
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		+ Footer                                                          +
+		+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		-->
+
+		<button style="position: absolute; top: -100px;"></button>
+
+<div id='mycontainer'>  <!-- NJM -->
+		<div
+			class='gLayoutMeasuring'
+			id='gGridLayoutRoot'
+
+			data-g-layout-container=''
+		>
+			<!-- Header -->
+			<div
+				gwc:content='includeSnippet("Header")'
+
+				data-g-layout-item='"row": 0, "column": 0'
+			/>
+
+			<!-- Network error -->
+			<div
+				id='gCSFError'
+				class='error-style'
+				style='display: none'
+				data-g-layout-item='"row": 1, "column": 0'
+			/>
+
+			<!-- Application Pane -->
+			<div
+				gwc:condition='application/ui &amp;&amp; !application/state/ended'
+				gwc:content='includeSnippet("UIFrame")'
+
+				data-g-layout-item='"row": 2, "column": 0, "isXSpacer": true, "isYSpacer": true'
+			/>
+
+			<!-- EndingPage Pane -->
+			<div
+				gwc:condition='application/state/ended'
+				gwc:content='includeSnippet("EndingPage")'
+
+				class='gEnding'
+
+				data-g-layout-item='"row": 3, "column": 0, "isXSpacer": true'
+			/>
+
+			<!-- Footer -->
+			<div
+				gwc:content='includeSnippet("Footer")'
+
+				data-g-layout-item='"row": 4, "column": 0'
+			/>
+		</div>
+
+		<!--
+		========================================================================
+		FrontCall component
+		-->
+		<div
+			gwc:condition='application/frontcall/pending &amp;&amp; !application/state/ended'
+
+			data-g-function='{frontcall/functionName}'
+			data-g-id='frontcall'
+			data-g-module='{frontcall/moduleName}'
+			data-g-return-count='{frontcall/returnCount}'
+		>
+			<div
+				gwc:repeat='p frontcall/parameters'
+
+				data-g-value='{p}'
+			/>
+		</div>
+
+		<!--
+		========================================================================
+		OnIdle component
+		-->
+		<div
+			gwc:condition='d/idle'
+
+			data-g-id='onidle'
+			data-g-idle-did='{d/idle ? d/idle/XDID : null}'
+			data-g-idle-timeout='{d/idle ? d/idle/timeout : 0}'
+		/>
+
+		<!--
+		========================================================================
+		qa_ready component for QA
+		-->
+		<div
+			gwc:define='
+				qar gDEV &amp;&amp; (d/action["qa_dialog_ready"] || d/action["qa_menu_ready"]);
+			'
+			gwc:condition='qar'
+
+			data-g-id='qaready'
+			data-g-idid='{qar/IDID}'
+		/>
+
+		<!--
+		========================================================================
+		accelerators component
+		-->
+		<div
+      gwc:define='clipboardActions ["editcopy", "editpaste", "editcut"]'
+			style='display:none;'
+
+			id='accelerators'
+			data-g-id='accelerators'
+		>
+			<gwc:dummy
+				gwc:define='
+					int application/interrupt;
+				'
+				gwc:condition='application/state/interactive'
+				gwc:omit-tag='true'
+			>
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName4'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName4}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName4'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName4}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName4'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName4}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName3'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName3}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName3'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName3}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName3'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName3}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName2'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName2}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName2'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName2}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName2'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName2}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName}'
+				/>
+
+				<div
+					gwc:condition='int/isActive'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName}'
+							data-g-local=''
+						/>
+
+						<div
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive &amp;&amp; !(a/name in clipboardActions)'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName}'
+						/>
+
+						<div
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+			</gwc:dummy>
+			<gwc:dummy
+				gwc:define='
+					int application/interrupt;
+				'
+				gwc:condition='application/state/processing'
+				gwc:omit-tag='true'
+			>
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName4'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName4}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName4'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName4}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName4'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName4}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName3'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName3}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName3'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName3}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName3'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName3}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName2'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName2}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName2'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName2}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName2'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName2}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<div
+					gwc:condition='int/isActive &amp;&amp; int/acceleratorName'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+					data-g-key-name='{int/acceleratorName}'
+				/>
+
+				<div
+					gwc:condition='int/isActive'
+
+					data-g-action-id='x'
+					data-g-action-name='{int/name}'
+				/>
+
+				<gwc:dummy
+					gwc:condition='window'
+					gwc:repeat='a window/localActions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName}'
+							data-g-local=''
+						/>
+
+						<div
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-local=''
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+
+				<gwc:dummy
+					gwc:condition='d'
+					gwc:repeat='a d/actions'
+					gwc:omit-tag='true'
+				>
+					<gwc:dummy
+						gwc:condition='a/isActive'
+						gwc:omit-tag='true'
+					>
+						<div
+							gwc:condition='a/acceleratorName'
+
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+							data-g-key-name='{a/acceleratorName}'
+						/>
+
+						<div
+							data-g-action-id='{a/IDID}'
+							data-g-action-name='{a/name}'
+						/>
+					</gwc:dummy>
+				</gwc:dummy>
+			</gwc:dummy>
+		</div>
+</div> <!-- id='mycontainer' NJM -->
+
+		<!--
+		========================================================================
+		QA component
+		-->
+		<div
+			gwc:condition='gDEV'
+
+			data-g-id='qa'
+			data-g-intr='{application/interrupt/isactive}'
+
+			style='
+				display:none;
+				z-index:9999;
+				position:fixed;
+				top:0;
+				left:0;
+				width:100%;
+				height:100%;
+				background-color:red;
+			'
+		/>
+
+		<!--
+		========================================================================
+		???
+		-->
+
+		<audio
+			id='gBeep'
+			src='{img}html5_bell.ogg'
+		/>
+		<!-- File Transfer -->
+		<gwc:dummy
+			gwc:condition='!application/state/ended &amp;&amp; application/meta/fileTransfer/currentFiles/length'
+			gwc:replace='includeSnippet("FileTransfer")'
+		/>
+	</body>
+</html>

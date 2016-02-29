@@ -1,0 +1,144 @@
+
+TOOLBAR
+	ITEM exit ( TEXT="Exit" , IMAGE="quit" )
+	ITEM accept ( TEXT="Accept" , IMAGE="accept" )
+	ITEM cancel ( TEXT="Cancel" , IMAGE="cancel" )
+	SEPARATOR
+	ITEM new_setlist ( TEXT="New Setlist", IMAGE="new" )
+	ITEM save_setlist ( TEXT="Save Setlist", IMAGE="disk" )
+	ITEM prn_setlist ( TEXT="Print Setlist", IMAGE="printer" )
+	ITEM del_setlist ( TEXT="Delete Setlist", IMAGE="delete" )
+	ITEM delete ( TEXT="Remove song", IMAGE="delete" )
+	SEPARATOR
+	ITEM insert ( TEXT="New Song", IMAGE="new" )
+	ITEM update ( TEXT="Update Song Details", IMAGE="pen" )
+	ITEM prn_songlist ( TEXT="Song Listing", IMAGE="printer" )
+END -- TB
+
+LAYOUT ( TEXT="Set List", STYLE="main" )
+HBOX ( SPLITTER )
+
+VBOX
+GRID ( STYLE="darkred" )
+{
+[master                              ]
+}
+END -- GRID
+TABLE (DOUBLECLICK=addtosetlist)
+{
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+                               [tot   ]
+}
+END -- TABLE
+END -- VBOX
+
+VBOX
+GRID ( STYLE="darkred" )
+{
+[setlist:s001               ]
+}
+END -- GRID
+TABLE
+{
+[no2][atitl                    ][atim  ][t2][k2]
+[no2][atitl                    ][atim  ][t2][k2]
+[no2][atitl                    ][atim  ][t2][k2]
+[no2][atitl                    ][atim  ][t2][k2]
+[no2][atitl                    ][atim  ][t2][k2]
+                                [atot  ]
+}
+END -- TABLE
+END -- VBOX
+
+GRID
+{
+<G "Song Detalis"                 >
+ [l001      ][f001               ]
+ [l002      ][f002               ]
+ [l003      ][f03:":":f3]([f003])
+ [l004      ][f4]
+ [l005      ][f5         ]
+ [l006      ][f6]
+ [l007      ][f7         ]
+ [l008      ][f8 ]
+ [l009      ][f9  ]
+ [l010      ][f10        ]
+ [l011      ][f11           ]
+ [l012      ][f12           ]
+ [l013      ][f13           ]
+ [l014      ][f14           ]
+ [l015      ][f15           ]
+}
+END -- GRID
+
+END -- HBOX
+
+ATTRIBUTES
+LABEL master : master, TEXT="Master Song List", STYLE="darkred";
+LABEL setlist : setlist, TEXT="Set List", STYLE="darkred";
+
+no1 = FORMONLY.no1, TITLE="#";
+PHANTOM FORMONLY.sid;
+titl = FORMONLY.stitl,TITLE="Title", IMAGECOLUMN=lrn;
+PHANTOM FORMONLY.lrn;
+PHANTOM FORMONLY.sdur;
+tim = FORMONLY.stim,TITLE="Duration", JUSTIFY=RIGHT;
+IMAGE t1 = FORMONLY.t1,TITLE="Tempo",AUTOSCALE;
+k1 = FORMONLY.k1,TITLE="Key";
+AGGREGATE tot = FORMONLY.l_stot,AGGREGATETEXT="Total:",AGGREGATETYPE=PROGRAM;
+
+no2 = FORMONLY.no2, TITLE="#";
+PHANTOM FORMONLY.aid;
+atitl = FORMONLY.atitl,TITLE="Title", IMAGECOLUMN=lrn2;
+PHANTOM FORMONLY.lrn2;
+PHANTOM FORMONLY.adur;
+atim = FORMONLY.atim,TITLE="Duration", JUSTIFY=RIGHT;
+IMAGE t2 = FORMONLY.t2,TITLE="Tempo",AUTOSCALE;
+k2 = FORMONLY.k2,TITLE="Key";
+AGGREGATE atot = FORMONLY.l_atot,AGGREGATETEXT="Total:",AGGREGATETYPE=PROGRAM;
+
+LABEL l001 : lab1, TEXT="Title:",JUSTIFY=RIGHT;
+LABEL l002 : lab3, TEXT="Artist:",JUSTIFY=RIGHT;
+LABEL l003 : lab3, TEXT="Duration:",JUSTIFY=RIGHT;
+LABEL l004 : lab4, TEXT="Done Live:",JUSTIFY=RIGHT;
+LABEL l005 : lab5, TEXT="Learnt:",JUSTIFY=RIGHT;
+LABEL l006 : lab6, TEXT="Recorded:",JUSTIFY=RIGHT;
+LABEL l007 : lab7, TEXT="Tempo:",JUSTIFY=RIGHT;
+LABEL l008 : lab8, TEXT="Key:",JUSTIFY=RIGHT;
+LABEL l009 : lab9, TEXT="Style:",JUSTIFY=RIGHT;
+LABEL l010 : lab10, TEXT="Genre:",JUSTIFY=RIGHT;
+LABEL l011 : lab11, TEXT="Vocals:",JUSTIFY=RIGHT;
+LABEL l012 : lab12, TEXT="Vox FX:",JUSTIFY=RIGHT;
+LABEL l013 : lab13, TEXT="Guitar Tuning:",JUSTIFY=RIGHT;
+LABEL l014 : lab14, TEXT="Capo:",JUSTIFY=RIGHT;
+LABEL l015 : lab15, TEXT="Guitar FX:",JUSTIFY=RIGHT;
+
+COMBOBOX s001 = FORMONLY.m_setlist_id, INITIALIZER=cb_setlist, NOT NULL;
+
+PHANTOM FORMONLY.id;
+f001 = FORMONLY.titl, SCROLL;
+f002 = FORMONLY.artist, SCROLL;
+f003 = FORMONLY.dur, NOENTRY;
+f03 = FORMONLY.l_min;
+f3 = FORMONLY.l_sec;
+CHECKBOX f4 = FORMONLY.done_live, VALUECHECKED="Y", VALUEUNCHECKED="N", NOT NULL;
+COMBOBOX f5 = FORMONLY.learnt,ITEMS=(("N","No"),("A","Almost"),("Y","Yes")), NOT NULL;
+CHECKBOX f6 = FORMONLY.recorded, VALUECHECKED="Y", VALUEUNCHECKED="N", NOT NULL;
+COMBOBOX f7 = FORMONLY.tempo,ITEMS=(("S","Slow"),("M","Medium"),("F","Fast")), NOT NULL;
+f8 = FORMONLY.songkey, NOT NULL;
+COMBOBOX f9 = FORMONLY.style,ITEMS=(("S","Strummed"),("M","Mixed"),("P","Picked")), NOT NULL;
+COMBOBOX f10 = FORMONLY.genre,ITEMS=(("F","Folk"),("B","Blues"),("J","Jazz"),("P","Pop"),("R","Rock"),("C","Country")), NOT NULL;
+COMBOBOX f11 = FORMONLY.vox,ITEMS=(("T","Tracey"),("N","Neil"),("B","Both")), NOT NULL;
+COMBOBOX f12 = FORMONLY.vox_fx,ITEMS=("None","Delay","Marmony"), NOT NULL;
+COMBOBOX f13 = FORMONLY.tuning,ITEMS=(("S","Standard"),("DD","Dropped D"),("OD","Open D")), NOT NULL;
+SPINEDIT f14 = FORMONLY.capo,VALUEMIN=0, VALUEMAX=12, NOT NULL;
+COMBOBOX f15 = FORMONLY.guitar_fx,ITEMS=("None","Chorus","Loop","Chorus-n-Loop"), NOT NULL;
+
+
+INSTRUCTIONS
+SCREEN RECORD tab1 ( FORMONLY.no1 THRU FORMONLY.k1 )
+SCREEN RECORD tab2 ( FORMONLY.no2 THRU FORMONLY.k2 )

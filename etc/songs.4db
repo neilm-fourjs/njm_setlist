@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Schema gstVersion="23217" id="{22b9f0ed-4686-4d15-af9f-e0d2bd750cd1}" version="1.6">
+  <AGSettings version="1.1">
+    <DynamicProperties version="2">
+      <DynamicProperty description="Associated label when generating form" initialValue="" isDefaultInherited="false" isHidden="false" label="Label" name="label" readOnly="false" type="TEXT"/>
+      <DynamicProperty description="Associated widget" editorInfo="contains:ButtonEdit|CheckBox|ComboBox|DateEdit|Edit|FFImage|FFLabel|Field|Phantom|ProgressBar|RadioGroup|Slider|SpinEdit|TextEdit|TimeEdit" initialValue="Edit" isDefaultInherited="false" isHidden="false" label="Widget" name="widget" readOnly="false" type="ENUM"/>
+      <DynamicPropertyGroup collapsed="false" description="Formfied properties" label="Formfield" name="formfieldGroup" properties="label;widget"/>
+    </DynamicProperties>
+    <NodeInfos version="1">
+      <NodeInfo mimeType="db/column" properties="widget;label"/>
+    </NodeInfos>
+  </AGSettings>
+  <ExtractionSettings>
+    <ExtractionOptions casens="LowerCase" cvmeth="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" ignerr="false" systab="false" type="SQLite"/>
+  </ExtractionSettings>
+  <Table active="false" name="setlist" status="U" uuid="db/table48">
+    <Column fglLength="4" fglType="2" fglTypeString="INTEGER" name="id" nativeTypeString="integer" notNull="false" order="1" status="U" uuid="db/column136"/>
+    <Column fglLength="20" fglType="201" fglTypeString="VARCHAR2(20)" name="name" nativeTypeString="varchar" notNull="false" order="2" status="U" uuid="db/column138"/>
+  </Table>
+  <Table active="false" name="setlist_hist" status="U" uuid="db/table50">
+    <Column fglLength="4" fglType="2" fglTypeString="INTEGER" name="setlist_id" nativeTypeString="integer" notNull="false" order="1" status="U" uuid="db/column140"/>
+    <Column fglLength="80" fglType="201" fglTypeString="VARCHAR2(80)" name="location" nativeTypeString="varchar" notNull="false" order="2" status="U" uuid="db/column142"/>
+    <Column fglLength="4" fglType="7" fglTypeString="DATE" name="performance" nativeTypeString="date" notNull="false" order="3" status="U" uuid="db/column144"/>
+  </Table>
+  <Table active="false" name="setlist_song" status="U" uuid="db/table52">
+    <Column fglLength="4" fglType="2" fglTypeString="INTEGER" name="setlist_id" nativeTypeString="integer" notNull="false" order="1" status="U" uuid="db/column146"/>
+    <Column fglLength="4" fglType="2" fglTypeString="INTEGER" name="song_id" nativeTypeString="integer" notNull="false" order="2" status="U" uuid="db/column148"/>
+    <Column fglLength="2" fglType="1" fglTypeString="SMALLINT" name="seq_no" nativeTypeString="smallint" notNull="false" order="3" status="U" uuid="db/column1"/>
+  </Table>
+  <Table active="false" name="songs" status="U" uuid="db/table54">
+    <Column fglLength="4" fglType="2" fglTypeString="INTEGER" name="id" nativeTypeString="integer" notNull="false" order="1" status="M" uuid="db/column150"/>
+    <Column fglLength="40" fglType="201" fglTypeString="VARCHAR2(40)" name="titl" nativeTypeString="varchar" notNull="false" order="2" status="U" uuid="db/column152"/>
+    <Column fglLength="40" fglType="201" fglTypeString="VARCHAR2(40)" name="artist" nativeTypeString="varchar" notNull="false" order="3" status="U" uuid="db/column154"/>
+    <Column fglLength="2" fglType="1" fglTypeString="SMALLINT" name="dur" nativeTypeString="smallint" notNull="false" order="4" status="U" uuid="db/column156"/>
+    <Column fglLength="1" fglType="0" fglTypeString="CHAR(1)" name="done_live" nativeTypeString="char" notNull="false" order="5" status="U" uuid="db/column158"/>
+    <Column fglLength="1" fglType="0" fglTypeString="CHAR(1)" name="learnt" nativeTypeString="char" notNull="false" order="6" status="U" uuid="db/column2"/>
+    <Column fglLength="1" fglType="0" fglTypeString="CHAR(1)" name="recorded" nativeTypeString="char" notNull="false" order="7" status="U" uuid="db/column3"/>
+    <Column fglLength="1" fglType="0" fglTypeString="CHAR(1)" name="tempo" nativeTypeString="char" notNull="false" order="8" status="U" uuid="db/column4"/>
+    <Column fglLength="3" fglType="0" fglTypeString="CHAR(3)" name="songkey" nativeTypeString="char" notNull="false" order="9" status="U" uuid="db/column5"/>
+    <Column fglLength="1" fglType="0" fglTypeString="CHAR(1)" name="style" nativeTypeString="char" notNull="false" order="10" status="U" uuid="db/column7"/>
+    <Column fglLength="1" fglType="0" fglTypeString="CHAR(1)" name="genre" nativeTypeString="char" notNull="false" order="11" status="U" uuid="db/column8"/>
+    <Column fglLength="16" fglType="201" fglTypeString="VARCHAR2(16)" name="vox" nativeTypeString="varchar" notNull="false" order="12" status="U" uuid="db/column9"/>
+    <Column fglLength="16" fglType="201" fglTypeString="VARCHAR2(16)" name="vox_fx" nativeTypeString="varchar" notNull="false" order="13" status="U" uuid="db/column10"/>
+    <Column fglLength="2" fglType="0" fglTypeString="CHAR(2)" name="tuning" nativeTypeString="char" notNull="false" order="14" status="U" uuid="db/column11"/>
+    <Column fglLength="2" fglType="1" fglTypeString="SMALLINT" name="capo" nativeTypeString="smallint" notNull="false" order="15" status="U" uuid="db/column6"/>
+    <Column fglLength="16" fglType="201" fglTypeString="VARCHAR2(16)" name="guitar_fx" nativeTypeString="varchar" notNull="false" order="16" status="U" uuid="db/column12"/>
+  </Table>
+  <Views ActiveView="View-1">
+    <View Name="View-1">
+      <Layout>
+        <![CDATA[AAAAAgAAABQAZABiAC8AdABhAGIAbABlADQAOAAAAAAAAAAAQDQAAAAAAAAAAAAAAAAAAAEAAAAUAGQAYgAvAHQAYQBiAGwAZQA1ADJACAAAAAAAAEBmoAAAAAAAP1BiTdLxqfwBAAAAFABkAGIALwB0AGEAYgBsAGUANQA0QHNAAAAAAABAY4AAAAAAAD9wYk3S8an8AQAAABQAZABiAC8AdABhAGIAbABlADUAMEBywAAAAAAAQDQAAAAAAAAAAAAAAAAAAAE=]]>
+      </Layout>
+    </View>
+  </Views>
+  <DBData>
+    <Data path="db/column150@fglType" type="2" value="2"/>
+  </DBData>
+</Schema>

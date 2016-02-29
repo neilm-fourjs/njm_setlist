@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ FOURJS_START_COPYRIGHT(D,2011)
+ Property of Four Js*
+ (c) Copyright Four Js 2011, 2015. All Rights Reserved.
+ * Trademark of Four Js Development Tools Europe Ltd
+   in the United States and elsewhere
+ 
+ This file can be modified by licensees according to the
+ product manual.
+ FOURJS_END_COPYRIGHT
+ -->
+<html
+	xmlns='http://www.w3.org/1999/xhtml'
+	xmlns:gwc='http://www.4js.com/GWC'
+>
+	<head>
+		<meta
+			content='text/html; charset=utf-8'
+			http-equiv='Content-Type'
+		/>
+	</head>
+
+	<body>
+
+<gwc:snippet-root>
+	<!--
+
+	Here is a customizable header.
+
+	Please replace by your own footer.
+
+	Warning: If you decide to remove the control bar, please note that you will have to find a remplacement for the reset settings and close buttons.
+
+	All the below code, can be safely replaced without loss of functionnality, except the block marked by CUSTOMIZATION_NOTICE.
+
+	-->
+	<div
+		gwc:define='
+			tw (application/ui/topmostnormalwindow ? application/ui/topmostnormalwindow : application/ui/window);
+		'
+
+		class='gHeader header-style'
+		tabindex='-1'
+
+		data-g-id='HeaderBar'
+		data-g-layout-container='"horizontalBubbling": false, "verticalBubbling": false'
+	>
+		<h1
+			class='gHeaderTitle'
+
+			data-g-layout-item='"row": 0, "column": 0, "isXSpacer": true'
+			data-g-layout-policy='"minWidth": 0'
+		>Neil's SetList Program</h1>
+
+		<!-- Control bar -->
+		<div
+			class='gControlBar'
+
+			data-g-id='ControlBar'
+			data-g-layout-container='"horizontalBubbling": false, "verticalBubbling": false'
+			data-g-layout-item='"row": 0, "column": 1'
+		>
+			<div
+				class='gDevelopmentControl'
+
+				data-g-layout-item='"row": 0, "column": 1'
+				data-g-layout-policy='"minWidth": 0'
+			>
+				<ul
+					gwc:condition='gDEV'
+
+					class='menu'
+				>
+					<li>
+						<span
+							class='iconized information'
+							title='Information'
+						/>
+
+						<div>
+							<table
+								class='information inset'
+							>
+								<tr>
+									<th>Version</th>
+
+									<td>{server/version}</td>
+								</tr>
+
+								<tr>
+									<th>Session</th>
+
+									<td>{document/SessionID}</td>
+								</tr>
+
+								<tr>
+									<th>Features</th>
+
+									<td>{uaFeatures}</td>
+								</tr>
+
+								<tr>
+									<th>Interactive</th>
+
+									<td>
+										<span
+											class='{application/state/interactive ? "success" : "failure"}'
+										>{application/state/interactive ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr>
+									<th>Processing</th>
+
+									<td>
+										<span
+											class='{application/state/processing ? "success" : "failure"}'
+										>{application/state/processing ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr
+									gwc:condition='application/state/processing'
+								>
+									<th>Processing transaction</th>
+
+									<td>
+										<span
+											class='{application/state/processing/transactionPending ? "success" : "failure"}'
+										>{application/state/processing/transactionPending ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr>
+									<th>Ended</th>
+
+									<td>
+										<span
+											class='{application/state/ended ? "success" : "failure"}'
+										>{application/state/ended ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr
+									gwc:condition='application/state/ended'
+								>
+									<th>Ended normal</th>
+
+									<td>
+										<span
+											class='{application/state/ended/normal ? "success" : "failure"}'
+										>{application/state/ended/normal ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr
+									gwc:condition='application/state/ended'
+								>
+									<th>Ended timeout</th>
+
+									<td>
+										<span
+											class='{application/state/ended/timeout ? "success" : "failure"}'
+										>{application/state/ended/timeout ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr
+									gwc:condition='application/state/ended'
+								>
+									<th>Ended error</th>
+
+									<td>
+										<span
+											class='{application/state/ended/error ? "success" : "failure"}'
+										>{application/state/ended/error ? "Yes" : "No"}</span>
+									</td>
+								</tr>
+
+								<tr>
+									<th>Incremental</th>
+
+									<td
+										id='incrementalInfo'
+									>
+										<span
+											class='default'
+										>No information</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+
+					<li>
+						<span
+							class='iconized debug'
+							title='Debug'
+						/>
+
+						<div>
+							<table
+								class='information inset'
+							>
+								<tr>
+									<th>Lag</th>
+
+									<td>
+										<input
+											id='gDev_netlag'
+											type='checkbox'
+										/>
+									</td>
+								</tr>
+
+								<tr>
+									<th>Send</th>
+
+									<td>
+										<input
+											checked='checked'
+											id='gDev_dialogautosend'
+											type='checkbox'
+										/>
+									</td>
+								</tr>
+
+								<tr>
+									<th>Lock</th>
+
+									<td>
+										<input
+											id='gDev_sendlocked'
+											type='checkbox'
+										/>
+									</td>
+								</tr>
+								
+								<tr>
+									<th>Keep open</th>
+
+									<td>
+										<input
+											id='gDev_keepOpen'
+											type='checkbox'
+										/>
+									</td>
+								</tr>
+								
+								<tr>
+									<th>Actions</th>
+
+									<td>
+										<button
+											onclick='gwc.dialog.send(); return false'
+										>Send</button>
+
+										<button
+											onclick='gwc.api.sendInvalidAction(); return false'
+										>Invalidate</button>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</li>
+
+					<li
+						class='hidden error'
+						id='gJavascriptErrors'
+					>
+						<span
+							class='iconized auierror'
+							title='Javascript errors'
+						/>
+
+						<div>
+							<table
+								class='inset'
+							>
+								<thead>
+									<tr>
+										<th>Message</th>
+									</tr>
+								</thead>
+
+								<tbody
+									id='gJavascriptErrorsList'
+								/>
+							</table>
+						</div>
+					</li>
+
+					<li
+						class='{application/state/ended ? "nohover" : null}'
+					>
+						<span
+							gwc:condition='application/state/ended'
+
+							class='disabled iconized auitree'
+							title='Display AUI tree'
+						/>
+
+						<a
+							gwc:condition='!application/state/ended'
+
+							class='iconized auitree'
+							href='{resourceuri("auiview/auiview.html", "SetHtml5")}?sessionid={document/sessionid}&amp;appid={application/id}'
+							onclick='window.open(href); return false'
+							title='Display AUI tree'
+						/>
+					</li>
+
+					<li
+						class='{!document/LogFileURL ? "nohover" : null}'
+					>
+						<span
+							gwc:condition='!document/LogFileURL'
+
+							class='disabled iconized log'
+							title='Show log file'
+						/>
+
+						<a
+							gwc:condition='document/LogFileURL'
+
+							class='iconized log'
+							href='{document/LogFileURL}'
+							onclick='window.open(href); return false'
+							title='Show log file'
+						/>
+					</li>
+
+					<li
+						class='{!document/vmlogfileurl ? "nohover" : null}'
+					>
+						<span
+							gwc:condition='!document/vmlogfileurl'
+
+							class='disabled iconized vm_log'
+							title='Show VM log file'
+						/>
+
+						<a
+							gwc:condition='document/vmlogfileurl'
+
+							class='iconized vm_log'
+							href='{document/vmlogfileurl}'
+							onclick='window.open(href); return false'
+							title='Show VM log file'
+						/>
+					</li>
+
+					<li
+						class='{application/state/ended ? "nohover" : null}'
+					>
+						<span
+							gwc:condition='application/state/ended'
+
+							class='disabled iconized reload'
+							title='Reload'
+						/>
+
+						<a
+							gwc:condition='!application/state/ended'
+
+							class='iconized reload'
+							href='{document/URL}'
+							onclick='window.onbeforeunload = null; window.location.replace(href.substr(0, href.lastIndexOf(&#39;/&#39;)+1)); return false'
+							title='Reload'
+						/>
+					</li>
+
+					<li>
+						<a
+							class='iconized restart'
+							href='{document/restartURL}'
+							title='Restart'
+						/>
+					</li>
+
+					<li
+						gwc:condition='isTouch'
+					>
+						<span
+							class='iconized mobile'
+							title='Mobile console'
+						/>
+
+						<div>
+							<pre
+								class='inset'
+								id='gConsole'
+								style='
+									font-size: smaller;
+									height: 15em;
+									overflow: auto;
+								'
+							/>
+
+							<input
+								onclick='document.getElementById("gConsole").innerHTML=""'
+								type='button'
+								value='Clear console'
+							/>
+						</div>
+					</li>
+
+					<li
+						class='error {application/state/ended || !document/errors ? "hidden" : null}'
+					>
+						<span
+							class='iconized auierror'
+							title='Engine errors'
+						/>
+
+						<div>
+							<pre
+								gwc:content='document/errors'
+
+								class='inset gDocumentErrors'
+							/>
+						</div>
+					</li>
+				</ul>
+			</div>
+
+			<div
+				class='gWindowControl'
+
+				data-g-layout-item='"row": 0, "column": 2'
+			>
+				<ul
+					class='menu'
+				>
+					<li
+						class='nohover'
+					>
+						<span
+							class='iconized loader gLoader'
+
+							data-g-id='loader'
+						/>
+					</li>
+
+					<!--
+
+					CUSTOMIZATION_NOTICE
+
+					The HTML5 theme is storing the table headers user preferences in the web browser local storage.
+
+					This action will reset this storage.
+
+					This is not a mandatory control and it can safely be removed from your customization. Keep in mind you will probably have to teach your users how to remove the storage from the browser settings, if they need to.
+					-->
+					<li>
+						<span
+							class='iconized settings'
+							onclick='document.getElementById("gStoredSettingsDisabled").checked = gwc.storedSettings.areDisabled(); document.getElementById("gStoredSettingsReadOnly").checked = gwc.storedSettings.areReadOnly(); '
+							title='Settings'
+						/>
+
+						<div>
+							<table
+								class='information inset'
+							>
+								<tr>
+									<td>---------------</td>
+
+									<th
+										colspan='2'
+										data-g-loc=''
+									>Stored settings</th>
+
+									<td>---------------</td>
+								</tr>
+
+								<tr>
+									<td />
+
+									<th data-g-loc=''>Disable</th>
+
+									<td>
+										<input
+											id='gStoredSettingsDisabled'
+											onclick='gwc.storedSettings.disable(event.currentTarget.checked); alert(gwc.api.getMessage("Stored settings changed"));'
+											type='checkbox'
+										/>
+									</td>
+
+									<td />
+								</tr>
+
+								<tr>
+									<td />
+
+									<th data-g-loc=''>Read only</th>
+
+									<td>
+										<input
+											id='gStoredSettingsReadOnly'
+											onclick='gwc.storedSettings.readOnly(event.currentTarget.checked);'
+											type='checkbox'
+										/>
+									</td>
+
+									<td />
+								</tr>
+
+								<tr>
+									<td />
+
+									<td
+										colspan='2'
+									>
+										<button
+											onclick='var answer=confirm(gwc.api.getMessage("Clear stored settings question"));if (answer) gwc.storedSettings.reset();return false;'
+											data-g-loc=''
+										>Clear settings</button>
+									</td>
+
+									<td />
+								</tr>
+							</table>
+						</div>
+					</li>
+
+					<!--
+
+					CUSTOMIZATION_NOTICE
+
+					This is the close action.
+
+					It closes the current application.
+
+					Depending on your needs, you may be able to remove it if the application already provide a similar feature.
+
+					-->
+					<li
+						class='{closeActionDisabled ? "nohover" : null}'
+					>
+						<span
+							gwc:condition='closeActionDisabled'
+
+							class='disabled iconized close'
+							title='Close'
+						/>
+
+						<a
+							gwc:condition='!closeActionDisabled'
+
+							class='iconized close'
+							href='#'
+							onclick='gwc.api.fireAcceleratorByName("close");'
+							title='Close'
+						/>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</gwc:snippet-root>
+
+	</body>
+</html>

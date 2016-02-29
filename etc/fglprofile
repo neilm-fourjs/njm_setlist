@@ -1,0 +1,6 @@
+
+dbi.default.driver = "dbmsqt3xx"
+
+dbi.database.songs.driver = "dbmsqt3xx"
+dbi.database.songs.source = "../db/songs.db"
+dbi.database.songs.ifxemul.datatype.serial.emulation = "native" 
