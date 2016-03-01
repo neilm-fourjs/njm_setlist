@@ -21,7 +21,8 @@ FUNCTION configureReport(l_filename, l_outputformat, l_preview, l_labels)
 		l_topMargin STRING,
 		l_bottomMargin STRING,
 		l_leftMargin STRING,
-		l_rightMargin STRING
+		l_rightMargin STRING,
+		l_fontDirectory STRING
 
 	IF l_outputFormat = "Image" THEN
 		LET l_outfilename = os.path.join(os.path.pwd(),l_filename||".png")
@@ -39,6 +40,12 @@ FUNCTION configureReport(l_filename, l_outputformat, l_preview, l_labels)
 		CALL fgl_report_configureDistributedProcessing(l_greServer,l_greSrvPort)
 	ELSE
 		CALL log(" NOT Using Distributed mode." )
+	END IF
+
+	IF l_outputFormat = "PDF" THEN
+		LET l_fontDirectory = fgl_getEnv("FONTDIR")
+		DISPLAY "Setting FontDir:",l_fontDirectory
+		CALL fgl_report_configurePDFDevice(l_fontDirectory ,NULL,NULL,NULL ,NULL ,NULL)
 	END IF
 
 	-- change some parameters
