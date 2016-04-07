@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fjs version="3.00.05-5448" configVersion="2" product="Genero Desktop Client">
+  <Shortcuts>
+    <Shortcut type="local" iconFilePath="C:\Fourjs\setlistv3\pics\tempo_f.png" parameters="" name="SetList" executable="C:\Fourjs\setlistv3\run.bat" workingDirectory="C:\Fourjs\setlistv3"/>
+  </Shortcuts>
+</fjs>

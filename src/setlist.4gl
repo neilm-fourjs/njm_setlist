@@ -20,9 +20,12 @@ DEFINE m_setlist_rec RECORD LIKE setlist.*
 DEFINE m_cb_setlist ui.ComboBox
 MAIN
 	DEFINE l_back STRING
-	DEFINe l_dbbackup STRING
+	DEFINE l_dbbackup STRING
+	DEFINE l_tim CHAR(8)
+
 
 	CALL STARTLOG( base.application.getProgramName()||".err" )
+	CALL log( "Current Directory:"||os.path.pwd() )
 
 	CALL db_connect("songs")
 
@@ -35,22 +38,29 @@ MAIN
 
 	CALL main_dialog()
 
-	LET l_dbbackup = "../db_backup"
+	LET l_dbbackup = os.path.join( os.path.dirname(os.path.pwd()),"db_backup")
 	IF NOT os.path.exists(l_dbbackup) THEN
-		IF os.path.mkdir(l_dbbackup) THEN
+		IF NOT os.path.mkdir(l_dbbackup) THEN
+			CALL log( SFMT("Failed to make backup dir '%1'",l_dbbackup) )
 		END IF
 	END IF
-	LET l_back = os.path.join(l_dbbackup,TODAY USING"YYYY-MM-DD"||"-"||TIME||"-songs.unl")
-	CALL log( "back up songs to "||NVL(l_back,"NULL"))
+	--LET l_dbbackup = os.path.join( l_dbbackup,"test" )
+	--LET l_dbbackup = os.path.join( l_dbbackup,(TODAY USING "YYYY-MM-DD"||"-"||TIME))
+
+	LET l_tim = TIME
+	LET l_tim = l_tim[1,2]||l_tim[4,5]||l_tim[7,8]
+	LET l_dbbackup = os.path.join( l_dbbackup,(TODAY USING "YYYYMMDD")||"-"||l_tim CLIPPED)
+	LET l_back = l_dbbackup.append("-songs.unl")
+	CALL log( "Back up songs to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM songs
-	LET l_back = os.path.join(l_dbbackup,TODAY USING"YYYY-MM-DD"||"-"||TIME||"-setlist.unl")
-	CALL log( "back up setlist to "||NVL(l_back,"NULL"))
+	LET l_back = l_dbbackup.append("-setlist.unl")
+	CALL log( "Back up setlist to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM setlist
-	LET l_back = os.path.join(l_dbbackup,TODAY USING"YYYY-MM-DD"||"-"||TIME||"-setlist_song.unl")
-	CALL log( "back up setlist_song to "||NVL(l_back,"NULL"))
+	LET l_back = l_dbbackup.append("-setlist_song.unl")
+	CALL log( "Back up setlist_song to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM setlist_song
-	LET l_back = os.path.join(l_dbbackup,TODAY USING"YYYY-MM-DD"||"-"||TIME||"-setlist_hist.unl")
-	CALL log( "back up setlist_hist to "||NVL(l_back,"NULL"))
+	LET l_back = l_dbbackup.append("-setlist_hist.unl")
+	CALL log( "Back up setlist_hist to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM setlist_hist
 END MAIN
 --------------------------------------------------------------------------------
