@@ -1,4 +1,8 @@
 export FGLRESOURCEPATH=../etc
 export FGLPROFILE=../etc/fglprofile
+export FGLIMAGEPATH=../pics/image2font.txt:../pics
+
 cd bin
-fglrun *.42r
+
+fglrun setlist.42r
+
