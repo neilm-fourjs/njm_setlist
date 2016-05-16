@@ -13,8 +13,8 @@ TYPE t_listitem RECORD
 		songkey STRING
 	END RECORD
 
-DEFINE m_songs, m_setlist DYNAMIC ARRAY OF t_listitem
-DEFINE m_saved BOOLEAN
+DEFINE m_songs, m_filtered, m_setlist DYNAMIC ARRAY OF t_listitem
+DEFINE m_saved, m_filter BOOLEAN
 DEFINE m_setlist_id INTEGER
 DEFINE m_setlist_rec RECORD LIKE setlist.*
 DEFINE m_cb_setlist ui.ComboBox
@@ -23,6 +23,7 @@ MAIN
 	DEFINE l_dbbackup STRING
 	DEFINE l_tim CHAR(8)
 
+	LET m_filter = FALSE
 
 	CALL STARTLOG( base.application.getProgramName()||".err" )
 	CALL log( "Current Directory:"||os.path.pwd() )
@@ -71,13 +72,14 @@ FUNCTION main_dialog()
 	DEFINE l_rec t_listitem
 
 	CALL get_setlist()
+	CALL filter_list()
 	CALL log( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
-		DISPLAY ARRAY m_songs TO tab1.*
+		DISPLAY ARRAY m_filtered TO tab1.*
 			BEFORE ROW
-				CALL disp_song( m_songs[ arr_curr() ].id )
+				CALL disp_song( m_filtered[ arr_curr() ].id )
 			ON UPDATE
-				CALL upd_song(m_songs[ arr_curr() ].id )
+				CALL upd_song( m_filtered[ arr_curr() ].id )
 			ON INSERT
 				CALL new_song( arr_curr() )
 			ON DRAG_START(l_dnd) LET l_drag_source = "songlist"
@@ -97,7 +99,7 @@ FUNCTION main_dialog()
 				DISPLAY "1.drag finished"
 				INITIALIZE l_drag_source TO NULL
 			ON ACTION addtosetlist
-				LET m_setlist[ m_setlist.getLength()+1 ].* = m_songs[ arr_curr() ].*
+				LET m_setlist[ m_setlist.getLength()+1 ].* = m_filtered[ arr_curr() ].*
 				LET m_saved = FALSE
 				CALL calc_tots()
 		END DISPLAY
@@ -140,9 +142,9 @@ FUNCTION main_dialog()
       ON DROP(l_dnd)
 				DISPLAY "2.drop:",l_drag_source
 				IF l_drag_source = "songlist" THEN
-					FOR x = 1 TO m_songs.getLength()
+					FOR x = 1 TO m_filtered.getLength()
 						IF DIALOG.isRowSelected("tab1",x) THEN
-							LET l_rec.* = m_songs[x].*
+							LET l_rec.* = m_filtered[x].*
 							DISPLAY "2.dropped songlist row:",x," ",l_rec.titl," into:",l_dnd.getLocationRow()
 							CALL m_setlist.insertElement( l_dnd.getLocationRow() )
 							LET m_setlist[ l_dnd.getLocationRow() ].* = l_rec.*
@@ -183,6 +185,9 @@ FUNCTION main_dialog()
 				END IF
 			END IF
 			EXIT DIALOG
+		ON ACTION filter
+		LET m_filter = NOT m_filter
+			CALL filter_list()
 		ON ACTION new_setlist
 			CALL new_setlist()
 		ON ACTION save_setlist
@@ -223,6 +228,7 @@ FUNCTION get_songs()
 	CALL m_songs.clear()
 	DECLARE song_cur CURSOR FOR SELECT * FROM songs ORDER BY titl
 	FOREACH song_cur INTO l_song.*
+		DISPLAY "songId:",l_song.id
 		CALL m_songs.appendElement()
 		CALL set_listItem(l_song.*, m_songs.getLength() ) RETURNING l_listitem.*
 		LET m_songs[ m_songs.getLength() ].* =  l_listitem.*
@@ -262,6 +268,7 @@ FUNCTION get_setlist()
 	DEFINE l_seq_no SMALLINT
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_listitem t_listitem
+
 	CALL log( "Getting setlist Id:"||NVL(m_setlist_id,"NULL"))
 	CALL m_setlist.clear()
 	SELECT * INTO m_setlist_rec.* FROM setlist sl WHERE sl.id = m_setlist_id
@@ -279,7 +286,28 @@ FUNCTION get_setlist()
 	END FOREACH
 	CALL calc_tots()
 	LET m_saved = TRUE
-
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION filter_list()
+	DEFINE x,y SMALLINT
+	DEFINE l_filtered BOOLEAN
+	DISPLAY "Filter List:",m_filter
+	CALL m_filtered.clear()
+	FOR x = 1 TO m_songs.getLength()
+		LET l_filtered = FALSE
+		IF m_filter THEN
+			FOR y = 1 TO m_setlist.getLength()
+				IF m_setlist[y].id = m_songs[x].id THEN
+					LET l_filtered = TRUE
+					EXIT FOR
+				END IF
+			END FOR
+		END IF
+		IF NOT l_filtered THEN
+			CALL m_filtered.appendElement()
+			LET m_filtered[ m_filtered.getLength() ].* = m_songs[x].*
+		END IF
+	END FOR
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION new_setlist()
@@ -405,7 +433,7 @@ FUNCTION calc_tots()
 		LET l_tot = l_tot + m_setlist[x].dur
 	END FOR
 	DISPLAY sec_to_time( l_tot, TRUE ) TO l_atot
-
+	IF m_filter THEN CALL filter_list() END IF
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION sec_to_time( l_sec, l_hours )
