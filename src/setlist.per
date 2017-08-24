@@ -7,6 +7,7 @@ TOOLBAR
 	ITEM new_setlist ( TEXT="New Setlist", IMAGE="new" )
 	ITEM save_setlist ( TEXT="Save Setlist", IMAGE="disk" )
 	ITEM prn_setlist ( TEXT="Print Setlist", IMAGE="printer" )
+	ITEM prn_setlist2 ( TEXT="Print Setlist2", IMAGE="printer" )
 	ITEM del_setlist ( TEXT="Delete Setlist", IMAGE="delete" )
 	ITEM delete ( TEXT="Remove song", IMAGE="delete" )
 	ITEM filter ( TEXT="Filter", IMAGE="filter" )
@@ -137,7 +138,7 @@ COMBOBOX f11 = FORMONLY.vox,ITEMS=(("T","Tracey"),("N","Neil"),("B","Both")), NO
 COMBOBOX f12 = FORMONLY.vox_fx,ITEMS=("None","Delay","Marmony"), NOT NULL;
 COMBOBOX f13 = FORMONLY.tuning,ITEMS=(("S","Standard"),("DD","Dropped D"),("OD","Open D")), NOT NULL;
 SPINEDIT f14 = FORMONLY.capo,VALUEMIN=0, VALUEMAX=12, NOT NULL;
-COMBOBOX f15 = FORMONLY.guitar_fx,ITEMS=("None","Chorus","Tremolo","Loop","Chorus-n-Loop","Tremolo-n-Loop"), NOT NULL;
+COMBOBOX f15 = FORMONLY.guitar_fx,ITEMS=("None","Chorus","Tremolo","Loop","Chorus-n-Loop","Tremolo-n-Loop","Echo"), NOT NULL;
 
 
 INSTRUCTIONS

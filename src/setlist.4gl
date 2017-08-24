@@ -193,9 +193,11 @@ FUNCTION main_dialog()
 		ON ACTION save_setlist
 			CALL save_setlist()
 		ON ACTION prn_setlist
-			CALL prn_setlist(TRUE)
+			CALL prn_setlist(TRUE,"../etc/setlist")
+		ON ACTION prn_setlist2
+			CALL prn_setlist(TRUE,"../etc/songlist")
 		ON ACTION prn_songlist
-			CALL prn_setlist(FALSE)
+			CALL prn_setlist(FALSE,"../etc/songlist")
 		ON ACTION del_setlist
 			IF fgl_winQuestion("Confirm","Delete setlist?","No","Yes|No","question",0) = "Yes" THEN
 				CALL del_setlist()
@@ -466,22 +468,15 @@ FUNCTION disp_song( l_id )
 
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION prn_setlist(l_setList)
-	DEFINE l_setList BOOLEAN
+FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 --&ifdef GRE
 	DEFINE
 		l_output_format STRING,
-		l_filename STRING,
 		l_sax_handler om.SaxDocumentHandler
 	DEFINE x SMALLINT
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_dur STRING
 
-	IF l_setList THEN
-		LET l_filename = "../etc/setlist"
-	ELSE
-		LET l_filename = "../etc/songlist"
-	END IF
 	LET l_output_format = "PDF"
 
 	INITIALIZE l_sax_handler TO NULL

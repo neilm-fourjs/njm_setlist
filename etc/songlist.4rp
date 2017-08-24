@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="23217" version="5.00">
-    <report:Settings RWPageWidth="a4length" RWPageLength="a4width" RWLeftMargin="1.3cm" RWTopMargin="1.3cm" RWRightMargin="1.3cm" RWBottomMargin="1.3cm">
+<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="30a05" version="6.00">
+    <report:Settings RWPageWidth="a4width" RWPageLength="a4length" RWLeftMargin="1.3cm" RWTopMargin="1.3cm" RWRightMargin="1.3cm" RWBottomMargin="1.3cm">
         <report:FormatList>
             <report:Format-SVG/>
             <report:Format-PDF/>
             <report:Format-image/>
         </report:FormatList>
     </report:Settings>
-    <report:Data RWDataLocation="setlist.rdd" RWFglReportName="report_name"/>
+    <report:Data RWDataLocation="../src/setlist.rdd" RWFglReportName="report_name"/>
     <report:Conflicts/>
     <rtl:stylesheet>
         <PXML>
             <rtl:match name="Report" nameConstraint="Report" minOccurs="1" maxOccurs="1">
-                <MINIPAGE name="Page Root" width="max" length="max" fontName="Arial" fontSize="9">
+                <MINIPAGE name="Page Root" width="max" length="max" fontName="Arial" fontSize="11">
                     <LAYOUTNODE name="Page Header" width="max" length="min" port="anyPageHeader">
                         <MINIPAGE name="StripeLayouter3" width="min" length="max" layoutDirection="leftToRight">
-                            <WORDBOX name="Report Title" x="0" y="max/2" anchorX="0" anchorY="0.5" alignment="baseline" fontSize="25" baselineType="leftleft" floatingBehavior="enclosed" text="Song List"/>
+                            <WORDBOX name="Report Title" x="0" y="max/2" anchorX="0" anchorY="0.5" alignment="baseline" fontSize="22" baselineType="leftleft" floatingBehavior="enclosed" text="Song List"/>
                             <PAGENOBOX name="PageNoBox" x="1.23857" y="max" anchorX="0" anchorY="1" alignment="baseline" baselineType="leftleft" floatingBehavior="enclosed" textAlignment="right"/>
                         </MINIPAGE>
                         <MINIPAGE name="Table Header" class="grwTableHeader" width="min" length="max" layoutDirection="leftToRight">
                             <WORDBOX name="Spacer" alignment="baseline" baselineType="leftleft" port="itemSeparator" text=" "/>
+                            <WORDBOX name="WordBox" width="{max(width(&quot;{&quot;X&quot;.translate()}&quot;),width(&quot;-000&quot;))}" floatingBehavior="enclosed" textAlignment="right" text="#"/>
                             <WORDBOX name="l_song.titl Title" class="grwTableStringColumnTitle" width="{max(width(&quot;{&quot;Titl&quot;.translate()}&quot;),width(&quot;M&quot;)*20)}" floatingBehavior="enclosed" text="Title" localizeText="true"/>
                             <WORDBOX name="l_song.artist Title" class="grwTableStringColumnTitle" width="{max(width(&quot;{&quot;Artist&quot;.translate()}&quot;),width(&quot;M&quot;)*20)}" floatingBehavior="enclosed" text="Artist" localizeText="true"/>
                             <WORDBOX name="l_song.dur Title" class="grwTableNumericColumnTitle" width="{width(&quot;0&quot;)*5}" floatingBehavior="enclosed" textAlignment="left" text="Dur" localizeText="true"/>
@@ -32,6 +33,8 @@
                         <rtl:input-variable name="x" type="FGLNumeric" expectedLocation="expectedHere"/>
                         <MINIPAGE name="Table Row" class="grwTableRow" width="min" length="max" bgColor="{{(x%2)==1?Color.fromRGBA(50,250,50,100):Color.WHITE}}" layoutDirection="leftToRight">
                             <WORDBOX name="Spacer_1" alignment="baseline" baselineType="leftleft" port="itemSeparator" text=" "/>
+                            <rtl:input-variable name="x" type="FGLNumeric" expectedLocation="expectedHere"/>
+                            <DECIMALFORMATBOX name="x Value" class="grwTableNumericColumnValue" width="{max(width(&quot;{&quot;X&quot;.translate()}&quot;),width(&quot;-000&quot;))}" anchorX="1" floatingBehavior="enclosed" textAlignment="right" format="-----#" value="{{x}}"/>
                             <rtl:input-variable name="l_song.learnt" type="FGLString" expectedLocation="expectedHere"/>
                             <rtl:input-variable name="l_song.titl" type="FGLString" expectedLocation="expectedHere"/>
                             <WORDWRAPBOX name="l_song.titl Value" class="grwTableStringColumnValue" width="width(&quot;M&quot;)*20" color="{{l_song.learnt==&quot;N&quot;?Color.RED:Color.BLACK}}" floatingBehavior="enclosed" text="{{l_song.titl}}"/>
