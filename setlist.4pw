@@ -68,6 +68,9 @@
       <File filePath="etc/default.4st"/>
       <File filePath="etc/fglprofile"/>
     </Library>
+    <Library binaryName="gas" id="452154458" label="gas">
+      <File filePath="gas/setlist.xcf"/>
+    </Library>
     <Library binaryName="lib" id="-620758080" label="lib">
       <File filePath="src/lib.4gl"/>
     </Library>
@@ -86,5 +89,13 @@
       <File compilerOptions="--build-rdd" filePath="src/setlist.4gl"/>
       <File filePath="src/setlist.per"/>
     </Application>
+    <Package binaryName="songlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458" description="Gar Package" label="songlist" platform="Genero Application Server">
+      <DynamicProperty name="packageId" value="songlist"/>
+      <DynamicProperty name="packageLabel" value="songlist"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
+      <Directory description="ETC" destinationDirectory="$(ProjectDir)/bin/etc" label="etc" sourceDirectory="$(ProjectDir)/etc"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin" includedFiles="*.xcf" label="gas" sourceDirectory="$(ProjectDir)/gas"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/pics" label="pics" sourceDirectory="$(ProjectDir)/bin"/>
+    </Package>
   </Group>
 </Project>

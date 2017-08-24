@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<APPLICATION Parent="defaultwa" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.4js.com/ns/gas/2.40/cfextws.xsd">
+	<!--RESOURCE Id="res.app.path" Source="INTERNAL">/home/pi/setlist</RESOURCE-->
+	<RESOURCE Id="res.app.path" Source="INTERNAL">$(res.deployment.path)</RESOURCE>
+	<EXECUTION>
+		<ENVIRONMENT_VARIABLE Id="FGLPROFILE">$(res.app.path)/etc/fglprofile</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="FGLIMAGEPATH">$(res.app.path)/pics</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="DBDATE">DMY4/</ENVIRONMENT_VARIABLE>
+		<PATH>$(res.app.path)</PATH>
+		<MODULE>setlist.42r</MODULE>
+	</EXECUTION>
+</APPLICATION>
