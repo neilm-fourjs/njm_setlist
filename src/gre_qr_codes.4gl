@@ -29,7 +29,7 @@ DEFINE
 
 	INITIALIZE sax_handler TO NULL
 	IF filename IS NOT NULL AND output_format IS NOT NULL THEN
-		LET sax_handler = configureReport(filename || '.4rp', output_format, m_preview)
+		LET sax_handler = configureReport(filename || '.4rp', output_format, m_preview, FALSE)
 	END IF
 
 	CALL log(" Start Report ..." )
