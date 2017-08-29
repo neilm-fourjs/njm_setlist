@@ -490,6 +490,7 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 	CALL log(" Outputing to Report ..." )
 
 	IF l_setList THEN
+	--	CALL m_setlist.sort("titl",FALSE)
 		FOR x = 1 TO m_setlist.getLength()
 			CALL get_song(m_setlist[x].id) RETURNING l_song.*
 			LET l_dur = sec_to_time( l_song.dur, FALSE)
