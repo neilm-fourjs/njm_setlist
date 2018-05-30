@@ -14,7 +14,7 @@ TYPE t_listitem RECORD
 	END RECORD
 
 DEFINE m_songs, m_filtered, m_setlist DYNAMIC ARRAY OF t_listitem
-DEFINE m_saved, m_filter BOOLEAN
+DEFINE m_saved, m_filter, m_filter2 BOOLEAN
 DEFINE m_setlist_id INTEGER
 DEFINE m_setlist_rec RECORD LIKE setlist.*
 DEFINE m_cb_setlist ui.ComboBox
@@ -72,7 +72,7 @@ FUNCTION main_dialog()
 	DEFINE l_rec t_listitem
 
 	CALL get_setlist()
-	CALL filter_list()
+	CALL filter_list(__LINE__)
 	CALL log( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
 		DISPLAY ARRAY m_filtered TO tab1.*
@@ -80,6 +80,8 @@ FUNCTION main_dialog()
 				CALL disp_song( m_filtered[ arr_curr() ].id )
 			ON UPDATE
 				CALL upd_song( m_filtered[ arr_curr() ].id )
+			ON DELETE
+				CALL del_song( m_filtered[ arr_curr() ].id, m_filtered[ arr_curr() ].titl  )
 			ON INSERT
 				CALL new_song( arr_curr() )
 			ON DRAG_START(l_dnd) LET l_drag_source = "songlist"
@@ -101,7 +103,7 @@ FUNCTION main_dialog()
 			ON ACTION addtosetlist
 				LET m_setlist[ m_setlist.getLength()+1 ].* = m_filtered[ arr_curr() ].*
 				LET m_saved = FALSE
-				CALL calc_tots()
+				CALL calc_tots(__LINE__)
 		END DISPLAY
 
 		INPUT BY NAME m_setlist_id ATTRIBUTES(WITHOUT DEFAULTS)
@@ -119,7 +121,7 @@ FUNCTION main_dialog()
 			ON DELETE
 				CALL log("Delete song from list:"||arr_curr()||":"||m_setlist[arr_curr()].titl)
 				LET m_saved = FALSE
-				CALL calc_tots()
+				CALL calc_tots(__LINE__)
 
 			ON DRAG_START(l_dnd) LET l_drag_source = "song"
 				DISPLAY "2.drag start:",l_drag_source
@@ -151,7 +153,7 @@ FUNCTION main_dialog()
 							LET m_saved = FALSE
 						END IF
 					END FOR
-					CALL calc_tots()
+					CALL calc_tots(__LINE__)
 				END IF
 				IF l_drag_source = "song" THEN
 					FOR x = 1 TO m_setlist.getLength()
@@ -173,7 +175,7 @@ FUNCTION main_dialog()
 		BEFORE DIALOG
       CALL DIALOG.setSelectionMode("tab1",TRUE)
       CALL DIALOG.setSelectionMode("tab2",TRUE)
-			CALL calc_tots()
+			CALL calc_tots(__LINE__)
 
 		ON ACTION close EXIT DIALOG
 		ON ACTION exit
@@ -186,8 +188,11 @@ FUNCTION main_dialog()
 			END IF
 			EXIT DIALOG
 		ON ACTION filter
-		LET m_filter = NOT m_filter
-			CALL filter_list()
+			LET m_filter = NOT m_filter
+			CALL filter_list(__LINE__)
+		ON ACTION filter2
+			LET m_filter2 = NOT m_filter2
+			CALL filter_notlearnt()
 		ON ACTION new_setlist
 			CALL new_setlist()
 		ON ACTION save_setlist
@@ -286,14 +291,27 @@ FUNCTION get_setlist()
 			LET m_setlist[ m_setlist.getLength() ].* = l_listitem.*
 		END IF
 	END FOREACH
-	CALL calc_tots()
+	CALL calc_tots(__LINE__)
 	LET m_saved = TRUE
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION filter_list()
+FUNCTION filter_notlearnt()
+	DEFINE x SMALLINT
+	DISPLAY "Filter2 List:",m_filter2
+	CALL m_filtered.clear()
+	FOR x = 1 TO m_songs.getLength()
+		IF m_songs[x].lrn != "learnt_n" OR NOT m_filter2 THEN
+			CALL m_filtered.appendElement()
+			LET m_filtered[ m_filtered.getLength() ].* = m_songs[x].*
+		END IF
+	END FOR
+	CALL calc_tots(__LINE__)
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION filter_list(l_line SMALLINT)
 	DEFINE x,y SMALLINT
 	DEFINE l_filtered BOOLEAN
-	DISPLAY "Filter List:",m_filter
+	DISPLAY SFMT("Filter List, Line %1 Filter: %2",l_line,m_filter)
 	CALL m_filtered.clear()
 	FOR x = 1 TO m_songs.getLength()
 		LET l_filtered = FALSE
@@ -310,6 +328,7 @@ FUNCTION filter_list()
 			LET m_filtered[ m_filtered.getLength() ].* = m_songs[x].*
 		END IF
 	END FOR
+	CALL calc_tots(__LINE__)
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION new_setlist()
@@ -385,11 +404,17 @@ FUNCTION new_song( l_arr )
 		INSERT INTO songs VALUES l_song.*
 		CALL get_songs()
 	END IF
-
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION upd_song( l_id )
-	DEFINE l_id INTEGER
+FUNCTION del_song( l_id INTEGER, l_titl STRING )
+	IF fgl_winQuestion("Confirm","Delete this song?\n"||l_titl,"No","Yes|No","questions",0) = "No" THEN
+		LET int_flag = TRUE
+		RETURN
+	END IF
+	DELETE FROM songs WHERE id = l_id
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION upd_song( l_id INTEGER )
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_min, l_sec SMALLINT
 
@@ -422,20 +447,19 @@ FUNCTION get_song(l_id)
 	RETURN l_song.*
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION calc_tots()
+FUNCTION calc_tots(l_line SMALLINT)
 	DEFINE l_tot, x SMALLINT
-
+	DISPLAY SFMT("Calc tots: from %1, MainList: %2 SetList: %3",l_line,m_filtered.getLength(),m_setlist.getLength())
 	LET l_tot = 0
-	FOR x = 1 TO m_songs.getLength()
-		LET l_tot = l_tot + m_songs[x].dur
+	FOR x = 1 TO m_filtered.getLength()
+		LET l_tot = l_tot + m_filtered[x].dur
 	END FOR
-	DISPLAY sec_to_time( l_tot, TRUE ) TO l_stot
+	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_filtered.getLength()||")" TO l_stot
 	LET l_tot = 0
 	FOR x = 1 TO m_setlist.getLength()
 		LET l_tot = l_tot + m_setlist[x].dur
 	END FOR
-	DISPLAY sec_to_time( l_tot, TRUE ) TO l_atot
-	IF m_filter THEN CALL filter_list() END IF
+	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_setlist.getLength()||")" TO l_atot
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION sec_to_time( l_sec, l_hours )
