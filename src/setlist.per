@@ -1,21 +1,21 @@
 
 TOOLBAR
-	ITEM exit ( TEXT="Exit" , IMAGE="quit" )
-	ITEM accept ( TEXT="Accept" , IMAGE="accept" )
-	ITEM cancel ( TEXT="Cancel" , IMAGE="cancel" )
+	ITEM exit
+	ITEM accept
+	ITEM cancel
 	SEPARATOR
-	ITEM new_setlist ( TEXT="New Setlist", IMAGE="new" )
-	ITEM save_setlist ( TEXT="Save Setlist", IMAGE="disk" )
-	ITEM prn_setlist ( TEXT="Print Setlist", IMAGE="printer" )
-	ITEM prn_setlist2 ( TEXT="Print Setlist2", IMAGE="printer" )
-	ITEM del_setlist ( TEXT="Delete Setlist", IMAGE="delete" )
-	ITEM delete ( TEXT="Remove song", IMAGE="delete" )
-	ITEM filter ( TEXT="Filter", IMAGE="filter" )
-	ITEM filter2 ( TEXT="Filter2", IMAGE="filter" )
+	ITEM insert
+	ITEM update
+	ITEM delete
+	ITEM filter
+	ITEM filter2
+	ITEM prn_songlist
 	SEPARATOR
-	ITEM insert ( TEXT="New Song", IMAGE="new" )
-	ITEM update ( TEXT="Update Song Details", IMAGE="pen" )
-	ITEM prn_songlist ( TEXT="Song Listing", IMAGE="printer" )
+	ITEM new_setlist
+	ITEM save_setlist
+	ITEM prn_setlist
+	ITEM prn_setlist2
+	ITEM del_setlist
 END -- TB
 
 LAYOUT ( TEXT="Set List", STYLE="main" )
@@ -24,7 +24,7 @@ HBOX ( SPLITTER )
 VBOX
 GRID ( STYLE="darkred" )
 {
-[master                              ]
+[b0|master                            ][b1|b2|b3|b4|b5|b6]
 }
 END -- GRID
 TABLE (DOUBLECLICK=addtosetlist)
@@ -42,7 +42,7 @@ END -- VBOX
 VBOX
 GRID ( STYLE="darkred" )
 {
-[setlist:s001               ]
+[setlist:s001               ][s1|s2|s3|s4|s5]
 }
 END -- GRID
 TABLE
@@ -75,14 +75,21 @@ GRID
  [l013      ][f13           ]
  [l014      ][f14           ]
  [l015      ][f15           ]
+ [:    :accept:cancel:     :]
 }
 END -- GRID
 
 END -- HBOX
 
 ATTRIBUTES
+BUTTON b0 : exit,TEXT="";
 LABEL master : master, TEXT="Master Song List", STYLE="darkred";
-LABEL setlist : setlist, TEXT="Set List", STYLE="darkred";
+BUTTON b1 : insert,TEXT="";
+BUTTON b2 : update,TEXT="";
+BUTTON b3 : delete,TEXT="";
+BUTTON b4 : filter,TEXT="";
+BUTTON b5 : filter2,TEXT="";
+BUTTON b6 : prn_songlist,TEXT="";
 
 no1 = FORMONLY.no1, TITLE="#";
 PHANTOM FORMONLY.sid;
@@ -93,6 +100,15 @@ tim = FORMONLY.stim,TITLE="Duration", JUSTIFY=RIGHT;
 IMAGE t1 = FORMONLY.t1,TITLE="Tempo",AUTOSCALE;
 k1 = FORMONLY.k1,TITLE="Key";
 AGGREGATE tot = FORMONLY.l_stot,AGGREGATETEXT="Total:",AGGREGATETYPE=PROGRAM;
+
+LABEL setlist : setlist, TEXT="Set List", STYLE="darkred";
+COMBOBOX s001 = FORMONLY.m_setlist_id, INITIALIZER=cb_setlist, NOT NULL;
+
+BUTTON s1 : new_setlist,TEXT="";
+BUTTON s2 : save_setlist,TEXT="";
+BUTTON s3 : prn_setlist,TEXT="";
+BUTTON s4 : prn_setlist2,TEXT="";
+BUTTON s5 : del_setlist,TEXT="";
 
 no2 = FORMONLY.no2, TITLE="#";
 PHANTOM FORMONLY.aid;
@@ -120,8 +136,6 @@ LABEL l013 : lab13, TEXT="Guitar Tuning:",JUSTIFY=RIGHT;
 LABEL l014 : lab14, TEXT="Capo:",JUSTIFY=RIGHT;
 LABEL l015 : lab15, TEXT="Guitar FX:",JUSTIFY=RIGHT;
 
-COMBOBOX s001 = FORMONLY.m_setlist_id, INITIALIZER=cb_setlist, NOT NULL;
-
 PHANTOM FORMONLY.id;
 f001 = FORMONLY.titl, SCROLL;
 f002 = FORMONLY.artist, SCROLL;
@@ -140,7 +154,8 @@ COMBOBOX f12 = FORMONLY.vox_fx,ITEMS=("None","Delay","Marmony"), NOT NULL;
 COMBOBOX f13 = FORMONLY.tuning,ITEMS=(("S","Standard"),("DD","Dropped D"),("OD","Open D")), NOT NULL;
 SPINEDIT f14 = FORMONLY.capo,VALUEMIN=0, VALUEMAX=12, NOT NULL;
 COMBOBOX f15 = FORMONLY.guitar_fx,ITEMS=("None","Chorus","Tremolo","Loop","Chorus-n-Loop","Tremolo-n-Loop","Echo"), NOT NULL;
-
+BUTTON accept : accept;
+BUTTON cancel : cancel;
 
 INSTRUCTIONS
 SCREEN RECORD tab1 ( FORMONLY.no1 THRU FORMONLY.k1 )
