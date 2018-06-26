@@ -80,6 +80,15 @@
       <File filePath="etc/front250.4rp"/>
       <File compilerOptions="--build-rdd" filePath="src/gre_qr_codes.4gl"/>
     </Application>
+    <Package binaryName="njm_setlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458" description="Gar Package" label="njm_setlist" platform="Genero Application Server">
+      <DynamicProperty name="packageId" value="songlist"/>
+      <DynamicProperty name="packageLabel" value="songlist"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/db" includedFiles="*.db" label="db" recursive="false" sourceDirectory="$(ProjectDir)/db"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/etc" label="etc" recursive="false" sourceDirectory="$(ProjectDir)/etc"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin" includedFiles="*.xcf" label="gas" recursive="false" sourceDirectory="$(ProjectDir)/gas_deploy"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/pics" label="pics" recursive="false" sourceDirectory="$(ProjectDir)/pics"/>
+    </Package>
     <Library binaryName="prn_lib" externalDependencies="libgre.42x" id="1268305552" label="prn_lib">
       <File filePath="src/prn_lib.4gl"/>
       <File filePath="etc/setlist.4rp"/>
@@ -90,14 +99,5 @@
       <File compilerOptions="--build-rdd" filePath="src/setlist.4gl"/>
       <File filePath="src/setlist.per"/>
     </Application>
-    <Package binaryName="songlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458" description="Gar Package" label="songlist" platform="Genero Application Server">
-      <DynamicProperty name="packageId" value="songlist"/>
-      <DynamicProperty name="packageLabel" value="songlist"/>
-      <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
-      <Directory destinationDirectory="$(ProjectDir)/bin/db" includedFiles="*.db" label="db" recursive="false" sourceDirectory="$(ProjectDir)/db"/>
-      <Directory destinationDirectory="$(ProjectDir)/bin/etc" label="etc" recursive="false" sourceDirectory="$(ProjectDir)/etc"/>
-      <Directory destinationDirectory="$(ProjectDir)/bin" includedFiles="*.xcf" label="gas" recursive="false" sourceDirectory="$(ProjectDir)/gas_deploy"/>
-      <Directory destinationDirectory="$(ProjectDir)/bin/pics" label="pics" recursive="false" sourceDirectory="$(ProjectDir)/pics"/>
-    </Package>
   </Group>
 </Project>

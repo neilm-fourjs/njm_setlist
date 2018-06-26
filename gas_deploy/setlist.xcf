@@ -3,8 +3,9 @@
 	<!--RESOURCE Id="res.app.path" Source="INTERNAL">/home/pi/setlist</RESOURCE-->
 	<RESOURCE Id="res.app.path" Source="INTERNAL">$(res.deployment.path)</RESOURCE>
 	<EXECUTION>
-		<ENVIRONMENT_VARIABLE Id="FGLPROFILE">$(res.app.path)/etc/fglprofile</ENVIRONMENT_VARIABLE>
-		<ENVIRONMENT_VARIABLE Id="FGLIMAGEPATH">$(res.app.path)/pics:$(res.fgldir)/lib:$(res.fgldir)/lib/image2font.txt</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="FGLPROFILE">../etc/fglprofile</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="FGLRESOURCEPATH">../etc</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="FGLIMAGEPATH">../pics:../pics/image2font.txt</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="DBDATE">DMY4/</ENVIRONMENT_VARIABLE>
 		<PATH>$(res.app.path)/bin</PATH>
 		<MODULE>setlist.42r</MODULE>
