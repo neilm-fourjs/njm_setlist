@@ -6,11 +6,12 @@ TOOLBAR
 	SEPARATOR
 	ITEM insert
 	ITEM update
-	ITEM delete
 	ITEM filter
 	ITEM filter2
 	ITEM prn_songlist
 	SEPARATOR
+	ITEM delete
+	ITEM break_set
 	ITEM new_setlist
 	ITEM save_setlist
 	ITEM prn_setlist
@@ -24,7 +25,7 @@ HBOX ( SPLITTER )
 VBOX
 GRID ( STYLE="darkred" )
 {
-[b0|master                            ][b1|b2|b3|b4|b5|b6]
+[b0|master                            ][b1|b2|b3|b4|b5]
 }
 END -- GRID
 TABLE (DOUBLECLICK=addtosetlist)
@@ -42,7 +43,7 @@ END -- VBOX
 VBOX
 GRID ( STYLE="darkred" )
 {
-[setlist:s001               ][s1|s2|s3|s4|s5]
+[setlist:s001               ][s1|s2|s3|s4|s5|s6|s7]
 }
 END -- GRID
 TABLE
@@ -86,10 +87,9 @@ BUTTON b0 : exit,TEXT="";
 LABEL master : master, TEXT="Master Song List", STYLE="darkred";
 BUTTON b1 : insert,TEXT="";
 BUTTON b2 : update,TEXT="";
-BUTTON b3 : delete,TEXT="";
-BUTTON b4 : filter,TEXT="";
-BUTTON b5 : filter2,TEXT="";
-BUTTON b6 : prn_songlist,TEXT="";
+BUTTON b3 : filter,TEXT="";
+BUTTON b4 : filter2,TEXT="";
+BUTTON b5 : prn_songlist,TEXT="";
 
 no1 = FORMONLY.no1, TITLE="#";
 PHANTOM FORMONLY.sid;
@@ -104,11 +104,13 @@ AGGREGATE tot = FORMONLY.l_stot,AGGREGATETEXT="Total:",AGGREGATETYPE=PROGRAM;
 LABEL setlist : setlist, TEXT="Set List", STYLE="darkred";
 COMBOBOX s001 = FORMONLY.m_setlist_id, INITIALIZER=cb_setlist, NOT NULL;
 
-BUTTON s1 : new_setlist,TEXT="";
-BUTTON s2 : save_setlist,TEXT="";
-BUTTON s3 : prn_setlist,TEXT="";
-BUTTON s4 : prn_setlist2,TEXT="";
-BUTTON s5 : del_setlist,TEXT="";
+BUTTON s1 : delete, TEXT="";
+BUTTON s2 : break_set, TEXT="";
+BUTTON s3 : new_setlist,TEXT="";
+BUTTON s4 : save_setlist,TEXT="";
+BUTTON s5 : prn_setlist,TEXT="";
+BUTTON s6 : prn_setlist2,TEXT="";
+BUTTON s7 : del_setlist,TEXT="";
 
 no2 = FORMONLY.no2, TITLE="#";
 PHANTOM FORMONLY.aid;

@@ -29,15 +29,16 @@
   <ActionDefault name="dialogtouched" validate="no" defaultView="no"  contextMenu="no"/>
 
 	<ActionDefault name="exit" text="Quit" image="fa-power-off"  contextMenu="no"/>
-	<ActionDefault name="insert" text="New Song" image="new" comment="Add a new song to the master list" contextMenu="no"/>
-  <ActionDefault name="update" text="Update Song" image="pen" comment="Update a song in the master list" contextMenu="no"/>
-  <ActionDefault name="delete" text="Remove song" image="delete" comment="Delete a song from the master list" contextMenu="no"/>
-  <ActionDefault name="filter" text="Filter" image="filter" comment="Filter master list to exclude playlist songs" contextMenu="no"/>
-  <ActionDefault name="filter2" text="Filter2" image="filter" comment="Filter master list to exclude 'red' songs" contextMenu="no"/>
-  <ActionDefault name="prn_songlist" text="Song Listing" image="printer" comment="Print master song list" contextMenu="no"/>
+	<ActionDefault name="insert" text="New Song" image="fa-plus-square" comment="Add a new song to the master list" contextMenu="no"/>
+  <ActionDefault name="update" text="Update Song" image="fa-pencil-square-o" comment="Update a song in the master list" contextMenu="no"/>
+  <ActionDefault name="delete" text="Remove song" image="fa-minus-square" comment="Delete a song from setlist" contextMenu="no"/>
+  <ActionDefault name="filter" text="Filter" image="fa-filter" comment="Filter master list to exclude playlist songs" contextMenu="no"/>
+  <ActionDefault name="filter2" text="Filter2" image="fa-filter" comment="Filter master list to exclude 'red' songs" contextMenu="no"/>
+  <ActionDefault name="prn_songlist" text="Song Listing" image="fa-print" comment="Print master song list" contextMenu="no"/>
   <ActionDefault name="new_setlist" text="New Setlist" image="new" comment="New Setlist" contextMenu="no"/>
+  <ActionDefault name="break_set" text="Break" image="fa-coffee" comment="Break in Set" contextMenu="no"/>
   <ActionDefault name="save_setlist" text="Save Setlist" image="disk" comment="Save Setlist" contextMenu="no"/>
-  <ActionDefault name="prn_setlist" text="Print Setlist" image="printer" comment="Print Setlist 1" contextMenu="no"/>
-  <ActionDefault name="prn_setlist2" text="Print Setlist2" image="printer" comment="Print Setlist 2" contextMenu="no"/>
-  <ActionDefault name="del_setlist" text="Delete Setlist" image="delete" comment="Delete setlist" contextMenu="no"/>
+  <ActionDefault name="prn_setlist" text="Print Setlist" image="fa-print" comment="Print Setlist 1" contextMenu="no"/>
+  <ActionDefault name="prn_setlist2" text="Print Setlist2" image="fa-print" comment="Print Setlist 2" contextMenu="no"/>
+  <ActionDefault name="del_setlist" text="Delete Setlist" image="fa-trash" comment="Delete setlist" contextMenu="no"/>
 </ActionDefaultList>

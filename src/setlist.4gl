@@ -123,6 +123,13 @@ FUNCTION main_dialog()
 				LET m_saved = FALSE
 				CALL calc_tots(__LINE__)
 
+			ON ACTION break_set
+				CALL m_setlist.insertElement( arr_curr() )
+				LET m_setlist[ arr_curr() ].titl = "    *** BREAK ***"
+				LET m_setlist[ arr_curr() ].lrn = "fa-coffee"
+				LET m_setlist[ arr_curr() ].dur = 0
+				LET m_setlist[ arr_curr() ].id = -1
+
 			ON DRAG_START(l_dnd) LET l_drag_source = "song"
 				DISPLAY "2.drag start:",l_drag_source
 			ON DRAG_ENTER(l_dnd)
@@ -272,23 +279,36 @@ END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION get_setlist()
 	DEFINE l_song_id INTEGER
-	DEFINE l_seq_no SMALLINT
+	DEFINE l_seq_no, l_cnt SMALLINT
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_listitem t_listitem
-
+	LET l_cnt = 0
 	CALL log( "Getting setlist Id:"||NVL(m_setlist_id,"NULL"))
 	CALL m_setlist.clear()
 	SELECT * INTO m_setlist_rec.* FROM setlist sl WHERE sl.id = m_setlist_id
-	DECLARE sl2_cur CURSOR FOR SELECT song_id, seq_no, s.* FROM setlist sl,setlist_song, songs s 
+	DECLARE sl2_cur CURSOR FOR
+		SELECT song_id, seq_no, songs.* 
+			FROM setlist sl, setlist_song
+			LEFT OUTER JOIN songs ON setlist_song.song_id = songs.id
 			WHERE sl.id = m_setlist_id
 				AND sl.id = setlist_song.setlist_id
-				AND setlist_song.song_id = s.id
 			ORDER BY seq_no
 	FOREACH sl2_cur INTO l_song_id, l_seq_no, l_song.*
-		IF l_song_id IS NOT NULL THEN
-			CALL m_setlist.appendElement()
-			CALL set_listItem(l_song.*, m_setlist.getLength() ) RETURNING l_listitem.*
+		CALL m_setlist.appendElement()
+		DISPLAY m_setlist.getLength()," Song ID:",l_song_id
+		IF l_song_id > 0 THEN
+			LET l_cnt = l_cnt + 1
+			CALL set_listItem(l_song.*, l_cnt ) RETURNING l_listitem.*
 			LET m_setlist[ m_setlist.getLength() ].* = l_listitem.*
+		ELSE
+			LET m_setlist[ m_setlist.getLength() ].dur = 0
+			LET m_setlist[ m_setlist.getLength() ].lrn = "fa-coffee"
+			LET m_setlist[ m_setlist.getLength() ].titl = "    *** BREAK ***"
+			LET m_setlist[ m_setlist.getLength() ].songkey = NULL
+			LET m_setlist[ m_setlist.getLength() ].tempo = NULL
+			LET m_setlist[ m_setlist.getLength() ].tim = NULL
+			LET m_setlist[ m_setlist.getLength() ].num = -1
+			LET m_setlist[ m_setlist.getLength() ].id = -1
 		END IF
 	END FOREACH
 	CALL calc_tots(__LINE__)
@@ -448,18 +468,22 @@ FUNCTION get_song(l_id)
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION calc_tots(l_line SMALLINT)
-	DEFINE l_tot, x SMALLINT
+	DEFINE l_tot, x, l_cnt SMALLINT
 	DISPLAY SFMT("Calc tots: from %1, MainList: %2 SetList: %3",l_line,m_filtered.getLength(),m_setlist.getLength())
 	LET l_tot = 0
+	LET l_cnt = 0
 	FOR x = 1 TO m_filtered.getLength()
 		LET l_tot = l_tot + m_filtered[x].dur
 	END FOR
 	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_filtered.getLength()||")" TO l_stot
 	LET l_tot = 0
 	FOR x = 1 TO m_setlist.getLength()
-		LET l_tot = l_tot + m_setlist[x].dur
+		IF m_setlist[x].id > 0 THEN
+			LET l_cnt = l_cnt + 1
+			LET l_tot = l_tot + m_setlist[x].dur
+		END IF
 	END FOR
-	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_setlist.getLength()||")" TO l_atot
+	DISPLAY sec_to_time( l_tot, TRUE )||"("||l_cnt||")" TO l_atot
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION sec_to_time( l_sec, l_hours )
