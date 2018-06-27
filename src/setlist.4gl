@@ -2,6 +2,7 @@
 IMPORT os
 SCHEMA songs
 
+CONSTANT C_BREAK = "    *** BREAK *** "
 TYPE t_listitem RECORD
 		num SMALLINT,
 		id INTEGER,
@@ -125,7 +126,7 @@ FUNCTION main_dialog()
 
 			ON ACTION break_set
 				CALL m_setlist.insertElement( arr_curr() )
-				LET m_setlist[ arr_curr() ].titl = "    *** BREAK ***"
+				LET m_setlist[ arr_curr() ].titl = C_BREAK
 				LET m_setlist[ arr_curr() ].lrn = "fa-coffee"
 				LET m_setlist[ arr_curr() ].dur = 0
 				LET m_setlist[ arr_curr() ].id = -1
@@ -303,7 +304,7 @@ FUNCTION get_setlist()
 		ELSE
 			LET m_setlist[ m_setlist.getLength() ].dur = 0
 			LET m_setlist[ m_setlist.getLength() ].lrn = "fa-coffee"
-			LET m_setlist[ m_setlist.getLength() ].titl = "    *** BREAK ***"
+			LET m_setlist[ m_setlist.getLength() ].titl = C_BREAK
 			LET m_setlist[ m_setlist.getLength() ].songkey = NULL
 			LET m_setlist[ m_setlist.getLength() ].tempo = NULL
 			LET m_setlist[ m_setlist.getLength() ].tim = NULL
@@ -468,10 +469,12 @@ FUNCTION get_song(l_id)
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION calc_tots(l_line SMALLINT)
-	DEFINE l_tot, x, l_cnt SMALLINT
+	DEFINE l_tot, l_tot2, x, l_cnt, l_cnt2 SMALLINT
 	DISPLAY SFMT("Calc tots: from %1, MainList: %2 SetList: %3",l_line,m_filtered.getLength(),m_setlist.getLength())
 	LET l_tot = 0
+	LET l_tot2 = 0
 	LET l_cnt = 0
+	LET l_cnt2 = 0
 	FOR x = 1 TO m_filtered.getLength()
 		LET l_tot = l_tot + m_filtered[x].dur
 	END FOR
@@ -480,7 +483,13 @@ FUNCTION calc_tots(l_line SMALLINT)
 	FOR x = 1 TO m_setlist.getLength()
 		IF m_setlist[x].id > 0 THEN
 			LET l_cnt = l_cnt + 1
+			LET l_cnt2 = l_cnt2 + 1
 			LET l_tot = l_tot + m_setlist[x].dur
+			LET l_tot2 = l_tot2 + m_setlist[x].dur
+		ELSE
+			LET m_setlist[x].titl = C_BREAK||"   Dur: ",sec_to_time( l_tot2, TRUE )||" ("||l_cnt2||")"
+			LET l_cnt2 = 0
+			LET l_tot2 = 0
 		END IF
 	END FOR
 	DISPLAY sec_to_time( l_tot, TRUE )||"("||l_cnt||")" TO l_atot
