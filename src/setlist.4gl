@@ -530,7 +530,7 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 	DEFINE
 		l_output_format STRING,
 		l_sax_handler om.SaxDocumentHandler
-	DEFINE x SMALLINT
+	DEFINE x, l_pg SMALLINT
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_dur STRING
 
@@ -546,18 +546,23 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 	--FOR i = 1 TO 10
 	CALL log(" Outputing to Report ..." )
 
+	LET l_pg = 1
 	IF l_setList THEN
 	--	CALL m_setlist.sort("titl",FALSE)
 		FOR x = 1 TO m_setlist.getLength()
-			CALL get_song(m_setlist[x].id) RETURNING l_song.*
-			LET l_dur = sec_to_time( l_song.dur, FALSE)
-			OUTPUT TO REPORT report_name( x, l_song.*, l_dur )
+			IF m_setlist[x].id > 0 THEN
+				CALL get_song(m_setlist[x].id) RETURNING l_song.*
+				LET l_dur = sec_to_time( l_song.dur, FALSE)
+				OUTPUT TO REPORT report_name( l_pg, x, l_song.*, l_dur )
+			ELSE
+				LET l_pg = l_pg + 1
+			END IF
 		END FOR
 	ELSE
 		FOR x = 1 TO m_songs.getLength()
 			CALL get_song(m_songs[x].id) RETURNING l_song.*
 			LET l_dur = sec_to_time( l_song.dur, FALSE )
-			OUTPUT TO REPORT report_name( x, l_song.*, l_dur )
+			OUTPUT TO REPORT report_name( l_pg, x, l_song.*, l_dur )
 		END FOR
 	END IF
 	CALL log(" Outputed to Report." )
@@ -569,16 +574,18 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 --&endif
 END FUNCTION
 --------------------------------------------------------------------------------
-REPORT report_name(x, l_song, l_dur)
-	DEFINE x SMALLINT
+REPORT report_name(l_pg, x , l_song, l_dur)
+	DEFINE l_pg, x SMALLINT
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_dur STRING
+
+	ORDER EXTERNAL BY  l_pg
 
 	FORMAT
 		FIRST PAGE HEADER
 			PRINT m_setlist_rec.name
 
 		ON EVERY ROW
-			PRINT x,l_song.*, l_dur
+			PRINT l_pg, x,l_song.*, l_dur
   
 END REPORT --report_name()

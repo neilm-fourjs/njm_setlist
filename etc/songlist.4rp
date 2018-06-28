@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="30a05" version="6.00">
+<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="30a09" version="6.00">
     <report:Settings RWPageWidth="a4width" RWPageLength="a4length" RWLeftMargin="1.00cm" RWTopMargin="1.00cm" RWRightMargin="1.00cm" RWBottomMargin="1.00cm">
         <report:FormatList>
             <report:Format-SVG/>
@@ -29,24 +29,26 @@
                         </MINIPAGE>
                         <MINIPAGE name="Separator" width="1" length="max" bgColor="#000000" layoutDirection="leftToRight"/>
                     </LAYOUTNODE>
-                    <rtl:match name="OnEveryRow" nameConstraint="OnEveryRow" minOccurs="0" maxOccurs="unbounded">
-                        <rtl:input-variable name="x" type="FGLNumeric" expectedLocation="expectedHere"/>
-                        <MINIPAGE name="Table Row" class="grwTableRow" width="min" length="max" bgColor="{{(x%2)==1?Color.fromRGBA(50,250,50,100):Color.WHITE}}" layoutDirection="leftToRight">
-                            <WORDBOX name="Spacer_1" alignment="baseline" baselineType="leftleft" port="itemSeparator" text=" "/>
+                    <rtl:match name="Group l_pg" nameConstraint="Group" minOccurs="0" maxOccurs="unbounded">
+                        <rtl:match name="OnEveryRow" nameConstraint="OnEveryRow" minOccurs="0" maxOccurs="unbounded">
                             <rtl:input-variable name="x" type="FGLNumeric" expectedLocation="expectedHere"/>
-                            <DECIMALFORMATBOX name="x Value" class="grwTableNumericColumnValue" width="{max(width(&quot;{&quot;X&quot;.translate()}&quot;),width(&quot;-000&quot;))}" anchorX="1" floatingBehavior="enclosed" textAlignment="right" format="-----#" value="{{x}}"/>
-                            <rtl:input-variable name="l_song.learnt" type="FGLString" expectedLocation="expectedHere"/>
-                            <rtl:input-variable name="l_song.titl" type="FGLString" expectedLocation="expectedHere"/>
-                            <WORDWRAPBOX name="l_song.titl Value" class="grwTableStringColumnValue" width="width(&quot;M&quot;)*20" color="{{l_song.learnt==&quot;N&quot;?Color.RED:Color.BLACK}}" floatingBehavior="enclosed" text="{{l_song.titl}}"/>
-                            <rtl:input-variable name="l_song.artist" type="FGLString" expectedLocation="expectedHere"/>
-                            <WORDWRAPBOX name="l_song.artist Value" class="grwTableStringColumnValue" width="width(&quot;M&quot;)*18" floatingBehavior="enclosed" text="{{l_song.artist}}"/>
-                            <rtl:input-variable name="l_song.songkey" type="FGLString" expectedLocation="expectedHere"/>
-                            <WORDBOX name="l_song.songkey Value" class="grwStringValue" width="width(&quot;W&quot;)*2" alignment="baseline" floatingBehavior="enclosed" text="{{l_song.songkey}}"/>
-                            <rtl:input-variable name="l_song.capo" type="FGLNumeric" expectedLocation="expectedHere"/>
-                            <DECIMALFORMATBOX name="l_song.capo Value" class="grwTableNumericColumnValue" width="width(&quot;Capo&quot;)" anchorX="1" floatingBehavior="enclosed" textAlignment="right" format="-----#" value="{{l_song.capo}}"/>
-                            <rtl:input-variable name="l_dur" type="FGLString" expectedLocation="expectedHere"/>
-                            <WORDWRAPBOX name="l_dur Value" class="grwTableStringColumnValue" width="width(&quot;0&quot;)*5" alignment="baseline" floatingBehavior="enclosed" text="{{l_dur}}" textAlignment="right"/>
-                        </MINIPAGE>
+                            <MINIPAGE name="Table Row" class="grwTableRow" width="min" length="max" bgColor="{{(x%2)==1?Color.fromRGBA(50,250,50,100):Color.WHITE}}" layoutDirection="leftToRight">
+                                <WORDBOX name="Spacer_1" alignment="baseline" baselineType="leftleft" port="itemSeparator" text=" "/>
+                                <rtl:input-variable name="x" type="FGLNumeric" expectedLocation="expectedHere"/>
+                                <DECIMALFORMATBOX name="x Value" class="grwTableNumericColumnValue" width="{max(width(&quot;{&quot;X&quot;.translate()}&quot;),width(&quot;-000&quot;))}" anchorX="1" floatingBehavior="enclosed" textAlignment="right" format="-----#" value="{{x}}"/>
+                                <rtl:input-variable name="l_song.learnt" type="FGLString" expectedLocation="expectedHere"/>
+                                <rtl:input-variable name="l_song.titl" type="FGLString" expectedLocation="expectedHere"/>
+                                <WORDWRAPBOX name="l_song.titl Value" class="grwTableStringColumnValue" width="width(&quot;M&quot;)*20" color="{{l_song.learnt==&quot;N&quot;?Color.RED:Color.BLACK}}" floatingBehavior="enclosed" text="{{l_song.titl}}"/>
+                                <rtl:input-variable name="l_song.artist" type="FGLString" expectedLocation="expectedHere"/>
+                                <WORDWRAPBOX name="l_song.artist Value" class="grwTableStringColumnValue" width="width(&quot;M&quot;)*18" floatingBehavior="enclosed" text="{{l_song.artist}}"/>
+                                <rtl:input-variable name="l_song.songkey" type="FGLString" expectedLocation="expectedHere"/>
+                                <WORDBOX name="l_song.songkey Value" class="grwStringValue" width="width(&quot;W&quot;)*2" alignment="baseline" floatingBehavior="enclosed" text="{{l_song.songkey}}"/>
+                                <rtl:input-variable name="l_song.capo" type="FGLNumeric" expectedLocation="expectedHere"/>
+                                <DECIMALFORMATBOX name="l_song.capo Value" class="grwTableNumericColumnValue" width="width(&quot;Capo&quot;)" anchorX="1" floatingBehavior="enclosed" textAlignment="right" format="-----#" value="{{l_song.capo}}"/>
+                                <rtl:input-variable name="l_dur" type="FGLString" expectedLocation="expectedHere"/>
+                                <WORDWRAPBOX name="l_dur Value" class="grwTableStringColumnValue" width="width(&quot;0&quot;)*5" alignment="baseline" floatingBehavior="enclosed" text="{{l_dur}}" textAlignment="right"/>
+                            </MINIPAGE>
+                        </rtl:match>
                     </rtl:match>
                 </MINIPAGE>
             </rtl:match>
