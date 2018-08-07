@@ -31,7 +31,7 @@
 	<ActionDefault name="exit" text="Quit" image="fa-power-off"  contextMenu="no"/>
 	<ActionDefault name="insert" text="New Song" image="fa-plus-square" comment="Add a new song to the master list" contextMenu="no"/>
   <ActionDefault name="update" text="Update Song" image="fa-pencil-square-o" comment="Update a song in the master list" contextMenu="no"/>
-  <ActionDefault name="delete" text="Remove song" image="fa-minus-square" comment="Delete a song from setlist" contextMenu="no"/>
+  <ActionDefault name="delete" text="Remove song" image="fa-minus-square" comment="Remove a song from setlist" contextMenu="no"/>
   <ActionDefault name="filter" text="Filter" image="fa-filter" comment="Filter master list to exclude playlist songs" contextMenu="no"/>
   <ActionDefault name="filter2" text="Filter2" image="fa-filter" comment="Filter master list to exclude 'red' songs" contextMenu="no"/>
   <ActionDefault name="prn_songlist" text="Song Listing" image="fa-print" comment="Print master song list" contextMenu="no"/>
