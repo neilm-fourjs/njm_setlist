@@ -14,8 +14,8 @@ TYPE t_listitem RECORD
 		songkey STRING
 	END RECORD
 
-DEFINE m_songs, m_filtered, m_setlist DYNAMIC ARRAY OF t_listitem
-DEFINE m_saved, m_filter, m_filter2 BOOLEAN
+DEFINE m_songs, m_filter_listed, m_setlist DYNAMIC ARRAY OF t_listitem
+DEFINE m_saved, m_filter_list, m_filter_learnt BOOLEAN
 DEFINE m_setlist_id INTEGER
 DEFINE m_setlist_rec RECORD LIKE setlist.*
 DEFINE m_cb_setlist ui.ComboBox
@@ -24,7 +24,7 @@ MAIN
 	DEFINE l_dbbackup STRING
 	DEFINE l_tim CHAR(8)
 
-	LET m_filter = FALSE
+	LET m_filter_list = FALSE
 
 	CALL STARTLOG( base.application.getProgramName()||".err" )
 	CALL log( "Current Directory:"||os.path.pwd() )
@@ -73,16 +73,16 @@ FUNCTION main_dialog()
 	DEFINE l_rec t_listitem
 
 	CALL get_setlist()
-	CALL filter_list(__LINE__)
+	CALL filter(__LINE__)
 	CALL log( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
-		DISPLAY ARRAY m_filtered TO tab1.*
+		DISPLAY ARRAY m_filter_listed TO tab1.*
 			BEFORE ROW
-				CALL disp_song( m_filtered[ arr_curr() ].id )
+				CALL disp_song( m_filter_listed[ arr_curr() ].id )
 			ON UPDATE
-				CALL upd_song( m_filtered[ arr_curr() ].id )
+				CALL upd_song( m_filter_listed[ arr_curr() ].id )
 			ON DELETE
-				CALL del_song( m_filtered[ arr_curr() ].id, m_filtered[ arr_curr() ].titl  )
+				CALL del_song( m_filter_listed[ arr_curr() ].id, m_filter_listed[ arr_curr() ].titl  )
 			ON INSERT
 				CALL new_song( arr_curr() )
 			ON DRAG_START(l_dnd) LET l_drag_source = "songlist"
@@ -102,7 +102,7 @@ FUNCTION main_dialog()
 				DISPLAY "1.drag finished"
 				INITIALIZE l_drag_source TO NULL
 			ON ACTION addtosetlist
-				LET m_setlist[ m_setlist.getLength()+1 ].* = m_filtered[ arr_curr() ].*
+				LET m_setlist[ m_setlist.getLength()+1 ].* = m_filter_listed[ arr_curr() ].*
 				LET m_saved = FALSE
 				CALL calc_tots(__LINE__)
 		END DISPLAY
@@ -152,9 +152,9 @@ FUNCTION main_dialog()
       ON DROP(l_dnd)
 				DISPLAY "2.drop:",l_drag_source
 				IF l_drag_source = "songlist" THEN
-					FOR x = 1 TO m_filtered.getLength()
+					FOR x = 1 TO m_filter_listed.getLength()
 						IF DIALOG.isRowSelected("tab1",x) THEN
-							LET l_rec.* = m_filtered[x].*
+							LET l_rec.* = m_filter_listed[x].*
 							DISPLAY "2.dropped songlist row:",x," ",l_rec.titl," into:",l_dnd.getLocationRow()
 							CALL m_setlist.insertElement( l_dnd.getLocationRow() )
 							LET m_setlist[ l_dnd.getLocationRow() ].* = l_rec.*
@@ -196,11 +196,13 @@ FUNCTION main_dialog()
 			END IF
 			EXIT DIALOG
 		ON ACTION filter
-			LET m_filter = NOT m_filter
-			CALL filter_list(__LINE__)
+			LET m_filter_list = NOT m_filter_list
+			CALL DIALOG.getForm().setElementImage("filter", IIF(m_filter_list,"reset_filter","fa-filter") )
+			CALL filter(__LINE__)
 		ON ACTION filter2
-			LET m_filter2 = NOT m_filter2
-			CALL filter_notlearnt()
+			LET m_filter_learnt = NOT m_filter_learnt
+			CALL DIALOG.getForm().setElementImage("filter2", IIF(m_filter_learnt,"reset_filter","fa-filter") )
+			CALL filter(__LINE__)
 		ON ACTION new_setlist
 			CALL new_setlist()
 		ON ACTION save_setlist
@@ -316,27 +318,14 @@ FUNCTION get_setlist()
 	LET m_saved = TRUE
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION filter_notlearnt()
-	DEFINE x SMALLINT
-	DISPLAY "Filter2 List:",m_filter2
-	CALL m_filtered.clear()
-	FOR x = 1 TO m_songs.getLength()
-		IF m_songs[x].lrn != "learnt_n" OR NOT m_filter2 THEN
-			CALL m_filtered.appendElement()
-			LET m_filtered[ m_filtered.getLength() ].* = m_songs[x].*
-		END IF
-	END FOR
-	CALL calc_tots(__LINE__)
-END FUNCTION
---------------------------------------------------------------------------------
-FUNCTION filter_list(l_line SMALLINT)
+FUNCTION filter(l_line SMALLINT)
 	DEFINE x,y SMALLINT
 	DEFINE l_filtered BOOLEAN
-	DISPLAY SFMT("Filter List, Line %1 Filter: %2",l_line,m_filter)
-	CALL m_filtered.clear()
+	DISPLAY SFMT("Filter List, Line %1 Filter: %2",l_line,m_filter_list)
+	CALL m_filter_listed.clear()
 	FOR x = 1 TO m_songs.getLength()
 		LET l_filtered = FALSE
-		IF m_filter THEN
+		IF m_filter_list THEN
 			FOR y = 1 TO m_setlist.getLength()
 				IF m_setlist[y].id = m_songs[x].id THEN
 					LET l_filtered = TRUE
@@ -344,9 +333,12 @@ FUNCTION filter_list(l_line SMALLINT)
 				END IF
 			END FOR
 		END IF
+		IF m_songs[x].lrn = "learnt_n" AND m_filter_learnt THEN
+			LET l_filtered = TRUE
+		END IF
 		IF NOT l_filtered THEN
-			CALL m_filtered.appendElement()
-			LET m_filtered[ m_filtered.getLength() ].* = m_songs[x].*
+			CALL m_filter_listed.appendElement()
+			LET m_filter_listed[ m_filter_listed.getLength() ].* = m_songs[x].*
 		END IF
 	END FOR
 	CALL calc_tots(__LINE__)
@@ -470,15 +462,15 @@ END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION calc_tots(l_line SMALLINT)
 	DEFINE l_tot, l_tot2, x, l_cnt, l_cnt2 SMALLINT
-	DISPLAY SFMT("Calc tots: from %1, MainList: %2 SetList: %3",l_line,m_filtered.getLength(),m_setlist.getLength())
+	DISPLAY SFMT("Calc tots: from %1, MainList: %2 SetList: %3",l_line,m_filter_listed.getLength(),m_setlist.getLength())
 	LET l_tot = 0
 	LET l_tot2 = 0
 	LET l_cnt = 0
 	LET l_cnt2 = 0
-	FOR x = 1 TO m_filtered.getLength()
-		LET l_tot = l_tot + m_filtered[x].dur
+	FOR x = 1 TO m_filter_listed.getLength()
+		LET l_tot = l_tot + m_filter_listed[x].dur
 	END FOR
-	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_filtered.getLength()||")" TO l_stot
+	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_filter_listed.getLength()||")" TO l_stot
 	LET l_tot = 0
 	FOR x = 1 TO m_setlist.getLength()
 		IF m_setlist[x].id > 0 THEN
