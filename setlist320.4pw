@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Project defaultApplication="18736" gstVersion="31404" version="3.3">
+<Project defaultApplication="18736" gstVersion="31405" version="3.3">
   <Settings>
     <DynamicProperties version="2">
       <DynamicProperty description="Accent color (Android 5.0 and later)" initialValue="#9575CD" isDefaultInherited="false" isHidden="false" label="Accent color" name="gma-accent-color" readOnly="false" type="COLOR"/>
@@ -64,20 +64,22 @@
   </Settings>
   <LanguageList version="1.0"/>
   <PlatformList version="1.0"/>
-  <Group environment="value:FONTDIR=/home/neilm/fonts,value:FGLPROFILE=../etc/fglprofile,value:FGLIMAGEPATH=../pics:../pics/image2font.txt" id="-755569125" label="SetList" language="Genero">
+  <Group environment="value:FONTDIR=/home/neilm/fonts,value:FGLPROFILE=../etc/fglprofile.pgs,value:FGLIMAGEPATH=../pics:../pics/image2font.txt" id="-755569125" label="SetList" language="Genero">
     <Library binaryName="Databases" id="1986" label="Databases">
       <File filePath="etc/songs.4db"/>
     </Library>
     <Library binaryName="etc" id="1810934636" label="etc">
       <File filePath="etc/default.4ad"/>
       <File filePath="etc/default.4st"/>
-      <File filePath="etc/fglprofile"/>
+      <File filePath="etc/fglprofile.pgs"/>
+      <File filePath="etc/fglprofile.sqt"/>
     </Library>
     <Library binaryName="gas" id="452154458" label="gas">
       <File filePath="gas_deploy/setlist.xcf"/>
     </Library>
     <Library binaryName="lib" id="-620758080" label="lib">
-      <File filePath="src/lib.4gl"/>
+      <File filePath="src/db.4gl"/>
+      <File filePath="src/log.4gl"/>
     </Library>
     <Application binaryName="marketing" commandLineArguments="https://facebook.com/offtherailsduo" dependencies="1268305552,1810934636,-620758080" id="2140468318" label="marketing">
       <File filePath="etc/back250.4rp"/>
@@ -87,7 +89,7 @@
     <Package binaryName="njm_setlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458" description="Gar Package" id="1062761472" label="njm_setlist" platform="Genero Application Server">
       <DynamicProperty name="packageId" value="songlist"/>
       <DynamicProperty name="packageLabel" value="songlist"/>
-      <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
+      <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?,*.unl" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
       <Directory destinationDirectory="$(ProjectDir)/bin/db" includedFiles="*.db" label="db" recursive="false" sourceDirectory="$(ProjectDir)/db"/>
       <Directory destinationDirectory="$(ProjectDir)/bin/etc" label="etc" recursive="false" sourceDirectory="$(ProjectDir)/etc"/>
       <Directory destinationDirectory="$(ProjectDir)/bin" includedFiles="*.xcf" label="gas" recursive="false" sourceDirectory="$(ProjectDir)/gas_deploy"/>
@@ -99,9 +101,11 @@
       <File filePath="etc/songlist.4rp"/>
     </Library>
     <Application binaryName="setlist" dependencies="1986,-620758080,1268305552" id="18736" label="setlist">
-      <File filePath="src/db.4gl"/>
       <File compilerOptions="--build-rdd" filePath="src/setlist.4gl"/>
       <File filePath="src/setlist.per"/>
+    </Application>
+    <Application binaryName="test" dependencies="-620758080" id="1064918672" label="test">
+      <File filePath="src/test.4gl"/>
     </Application>
   </Group>
 </Project>

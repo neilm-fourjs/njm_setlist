@@ -1,5 +1,7 @@
 
 IMPORT os
+IMPORT FGL log
+IMPORT FGL db
 SCHEMA songs
 
 CONSTANT C_BREAK = "    *** BREAK *** "
@@ -20,18 +22,21 @@ DEFINE m_setlist_id INTEGER
 DEFINE m_setlist_rec RECORD LIKE setlist.*
 DEFINE m_cb_setlist ui.ComboBox
 MAIN
-	DEFINE l_back STRING
-	DEFINE l_dbbackup STRING
-	DEFINE l_tim CHAR(8)
 
 	LET m_filter_list = FALSE
 
 	CALL STARTLOG( base.application.getProgramName()||".err" )
 	CALL log( "Current Directory:"||os.path.pwd() )
 
-	CALL db_connect("songs")
+	CALL db.connect("songs")
 
-	IF ARG_VAL(1) = "load" THEN CALL db_load() END IF
+	CASE ARG_VAL(1)
+		WHEN "drop" CALL db.drop()
+		WHEN "create" CALL db.create()
+		WHEN "newload" CALL db.newload()
+		WHEN "load" CALL db.load()
+		WHEN "unload" CALL db.unload()
+	END CASE
 
 	CALL get_songs()
 
@@ -40,30 +45,8 @@ MAIN
 
 	CALL main_dialog()
 
-	LET l_dbbackup = os.path.join( os.path.dirname(os.path.pwd()),"db_backup")
-	IF NOT os.path.exists(l_dbbackup) THEN
-		IF NOT os.path.mkdir(l_dbbackup) THEN
-			CALL log( SFMT("Failed to make backup dir '%1'",l_dbbackup) )
-		END IF
-	END IF
-	--LET l_dbbackup = os.path.join( l_dbbackup,"test" )
-	--LET l_dbbackup = os.path.join( l_dbbackup,(TODAY USING "YYYY-MM-DD"||"-"||TIME))
+	CALL db.backup()
 
-	LET l_tim = TIME
-	LET l_tim = l_tim[1,2]||l_tim[4,5]||l_tim[7,8]
-	LET l_dbbackup = os.path.join( l_dbbackup,(TODAY USING "YYYYMMDD")||"-"||l_tim CLIPPED)
-	LET l_back = l_dbbackup.append("-songs.unl")
-	CALL log( "Back up songs to "||NVL(l_back,"NULL"))
-	UNLOAD TO l_back SELECT * FROM songs
-	LET l_back = l_dbbackup.append("-setlist.unl")
-	CALL log( "Back up setlist to "||NVL(l_back,"NULL"))
-	UNLOAD TO l_back SELECT * FROM setlist
-	LET l_back = l_dbbackup.append("-setlist_song.unl")
-	CALL log( "Back up setlist_song to "||NVL(l_back,"NULL"))
-	UNLOAD TO l_back SELECT * FROM setlist_song
-	LET l_back = l_dbbackup.append("-setlist_hist.unl")
-	CALL log( "Back up setlist_hist to "||NVL(l_back,"NULL"))
-	UNLOAD TO l_back SELECT * FROM setlist_hist
 END MAIN
 --------------------------------------------------------------------------------
 FUNCTION main_dialog()
@@ -232,6 +215,7 @@ FUNCTION cb_setlist(cb)
 	DECLARE sl_cur CURSOR FOR SELECT id,name FROM setlist
 	FOREACH sl_cur INTO l_id, l_name
 		IF l_name IS NOT NULL THEN
+			DISPLAY "cb_setlist:",l_id," :",l_name
 			CALL cb.addItem( l_id, l_name CLIPPED )
 			LET m_setlist_id = l_id
 		END IF
@@ -245,7 +229,7 @@ FUNCTION get_songs()
 	CALL m_songs.clear()
 	DECLARE song_cur CURSOR FOR SELECT * FROM songs ORDER BY titl
 	FOREACH song_cur INTO l_song.*
-		DISPLAY "songId:",l_song.id
+--		DISPLAY "songId:",l_song.id
 		CALL m_songs.appendElement()
 		CALL set_listItem(l_song.*, m_songs.getLength() ) RETURNING l_listitem.*
 		LET m_songs[ m_songs.getLength() ].* =  l_listitem.*
@@ -346,6 +330,7 @@ END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION new_setlist()
 	DEFINE l_name VARCHAR(20)
+	DEFINE l_id INTEGER
 
 	LET int_flag = FALSE
 	PROMPT "Enter Name for Set List:" FOR l_name
@@ -355,6 +340,9 @@ FUNCTION new_setlist()
 		CALL fgl_winMessage("Error","Set List already exists!","exclamation")
 		RETURN
 	END IF
+{	SELECT MAX( id ) INTO l_id FROM setlist
+	LET l_id = l_id + 1
+	INSERT INTO setlist ( id, name ) VALUES( l_id, l_name )}
 	INSERT INTO setlist ( name ) VALUES( l_name )
 	CALL m_setlist.clear()
 	CALL cb_setlist(m_cb_setlist)

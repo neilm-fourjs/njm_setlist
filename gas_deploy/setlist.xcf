@@ -2,12 +2,18 @@
 <APPLICATION Parent="defaultwa" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.4js.com/ns/gas/2.40/cfextws.xsd">
 	<!--RESOURCE Id="res.app.path" Source="INTERNAL">/home/pi/setlist</RESOURCE-->
 	<RESOURCE Id="res.app.path" Source="INTERNAL">$(res.deployment.path)</RESOURCE>
-	<EXECUTION>
-		<ENVIRONMENT_VARIABLE Id="FGLPROFILE">../etc/fglprofile</ENVIRONMENT_VARIABLE>
+	<EXECUTION AllowUrlParameters="TRUE">
+		<ENVIRONMENT_VARIABLE Id="FGLPROFILE">../etc/fglprofile.pgs</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="FGLRESOURCEPATH">../etc</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="FGLIMAGEPATH">../pics:../pics/image2font.txt</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="DBDATE">DMY4/</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="LOGDIR">../../logs</ENVIRONMENT_VARIABLE>
 		<PATH>$(res.app.path)/bin</PATH>
 		<MODULE>setlist.42r</MODULE>
 	</EXECUTION>
+	<UA_OUTPUT>
+		<PROXY>$(res.uaproxy.cmd)</PROXY>
+		<PUBLIC_IMAGEPATH>$(res.public.resources)</PUBLIC_IMAGEPATH>
+		<GBC>gbc-clean</GBC>
+	</UA_OUTPUT>
 </APPLICATION>
