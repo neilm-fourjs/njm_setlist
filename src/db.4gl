@@ -28,7 +28,7 @@ FUNCTION connect(l_db)
 		LET m_db = m_dbname
 	END IF
 
-	CALL log.logIt( SFMT("Connecting to DB: %1 Driver: %2",m_dbname,m_dbtype))
+	CALL log.logIt( SFMT("Connecting to DB: %1 Driver: %2 Profile: %3",m_dbname,m_dbtype, fgl_getEnv("FGLPROFILE")))
 	TRY
 		CONNECT TO m_dbname
 	CATCH

@@ -26,7 +26,7 @@ MAIN
 
 	LET m_filter_list = FALSE
 
-	CALL STARTLOG( base.application.getProgramName()||".err" )
+	CALL STARTLOG( log.errorLogName() )
 	CALL log.logIt( "Current Directory:"||os.path.pwd() )
 
 	CALL db.connect("songs")

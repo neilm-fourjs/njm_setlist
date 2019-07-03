@@ -9,7 +9,7 @@
 			<ENVIRONMENT_VARIABLE Id="FGLRESOURCEPATH">../etc</ENVIRONMENT_VARIABLE>
 			<ENVIRONMENT_VARIABLE Id="DBDATE">DMY4/</ENVIRONMENT_VARIABLE>
 			<ENVIRONMENT_VARIABLE Id="LOGDIR">../../logs</ENVIRONMENT_VARIABLE>
-      <PATH>$(res.deployment.path)</PATH>
+      <PATH>$(res.deployment.path)/bin</PATH>
       <MODULE>ws_setList</MODULE>
       <POOL>
         <START>3</START>

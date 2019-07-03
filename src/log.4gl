@@ -1,6 +1,18 @@
 IMPORT os
 DEFINE m_logDir STRING
 DEFINE m_logFile STRING
+DEFINE m_errFile STRING
+--------------------------------------------------------------------------------
+FUNCTION errorLogName() RETURNS STRING
+	IF m_logDir IS NULL THEN LET m_logDir = fgl_getEnv("LOGDIR") END IF
+	IF m_logDir IS NULL THEN LET m_logDir = "." END IF
+	IF m_errFile IS NULL THEN LET m_errFile = os.path.join(m_logDir,base.application.getProgramName()||".err") END IF
+	RETURN m_errFile
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION error_log(  )
+	CALL logIt( SFMT("Error %1 %2", STATUS, ERR_GET(STATUS) ) )
+END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION logIt( l_str )
 	DEFINE l_str STRING

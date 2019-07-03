@@ -87,7 +87,7 @@
       <File filePath="etc/front250.4rp"/>
       <File compilerOptions="--build-rdd" filePath="src/gre_qr_codes.4gl"/>
     </Application>
-    <Package binaryName="njm_setlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458" description="Gar Package" id="1062761472" label="njm_setlist" platform="Genero Application Server">
+    <Package binaryName="njm_setlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458,2126940491,2140468318" description="Gar Package" id="1062761472" label="njm_setlist" platform="Genero Application Server">
       <DynamicProperty name="packageId" value="songlist"/>
       <DynamicProperty name="packageLabel" value="songlist"/>
       <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?,*.unl" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
