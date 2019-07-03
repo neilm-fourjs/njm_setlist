@@ -1,5 +1,6 @@
 
 IMPORT os
+IMPORT FGL log
 
 --------------------------------------------------------------------------------
 FUNCTION configureReport(l_filename, l_outputformat, l_preview, l_labels)
@@ -29,17 +30,17 @@ FUNCTION configureReport(l_filename, l_outputformat, l_preview, l_labels)
 	ELSE
 		LET l_outfilename = os.path.join(os.path.pwd(),l_filename||"."||l_outputformat.toLowerCase())
 	END IF
-	CALL log(" Report Configuring for '"||l_filename||"' ..." )
+	CALL log.logIt(" Report Configuring for '"||l_filename||"' ..." )
 	-- load the 4rp file
 	LET l_stat = fgl_report_loadCurrentSettings(l_filename)
 
 	LET l_greServer = fgl_getEnv("GRESERVER")
 	LET l_greSrvPort = fgl_getEnv("GRESERVERPORT")
 	IF l_greServer IS NOT NULL AND l_greSrvPort IS NOT NULL THEN
-		CALL log(" Using Distributed mode:"||l_greServer||":"||l_greSrvPort )
+		CALL log.logIt(" Using Distributed mode:"||l_greServer||":"||l_greSrvPort )
 		CALL fgl_report_configureDistributedProcessing(l_greServer,l_greSrvPort)
 	ELSE
-		CALL log(" NOT Using Distributed mode." )
+		CALL log.logIt(" NOT Using Distributed mode." )
 	END IF
 
 	IF l_outputFormat = "PDF" THEN
@@ -76,9 +77,9 @@ FUNCTION configureReport(l_filename, l_outputformat, l_preview, l_labels)
 				l_labelsPerColumn )
 		CALL fgl_report_setPaperMargins(l_topMargin, l_bottomMargin, l_leftMargin, l_rightMargin )
 	END IF
-	CALL log(SFMT( "GRE Report %1 Dev: %2 Preview: %3 Out: %4", l_filename, l_outputformat, l_preview, l_outfilename ) )
+	CALL log.logIt(SFMT( "GRE Report %1 Dev: %2 Preview: %3 Out: %4", l_filename, l_outputformat, l_preview, l_outfilename ) )
 
-	CALL log(" Report Configured." )
+	CALL log.logIt(" Report Configured." )
 	-- use the report
 	-- RETURN fgl_report_createProcessLevelDataFile( "data.xml" )
 	RETURN fgl_report_commitCurrentSettings()

@@ -2,6 +2,7 @@
 IMPORT os
 IMPORT FGL log
 IMPORT FGL db
+IMPORT FGL prn_lib
 SCHEMA songs
 
 CONSTANT C_BREAK = "    *** BREAK *** "
@@ -26,7 +27,7 @@ MAIN
 	LET m_filter_list = FALSE
 
 	CALL STARTLOG( base.application.getProgramName()||".err" )
-	CALL log( "Current Directory:"||os.path.pwd() )
+	CALL log.logIt( "Current Directory:"||os.path.pwd() )
 
 	CALL db.connect("songs")
 
@@ -57,7 +58,7 @@ FUNCTION main_dialog()
 
 	CALL get_setlist()
 	CALL filter(__LINE__)
-	CALL log( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
+	CALL log.logIt( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
 		DISPLAY ARRAY m_filter_listed TO tab1.*
 			BEFORE ROW
@@ -103,7 +104,7 @@ FUNCTION main_dialog()
 				CALL upd_song( m_setlist[ arr_curr() ].id )
 
 			ON DELETE
-				CALL log("Delete song from list:"||arr_curr()||":"||m_setlist[arr_curr()].titl)
+				CALL log.logIt("Delete song from list:"||arr_curr()||":"||m_setlist[arr_curr()].titl)
 				LET m_saved = FALSE
 				CALL calc_tots(__LINE__)
 
@@ -174,7 +175,7 @@ FUNCTION main_dialog()
 				IF fgl_winQuestion("Confirm","Save changes to setlist?","No","Yes|No","question",0) = "Yes" THEN
 					CALL save_setlist()
 				ELSE
-					CALL log("Save setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
+					CALL log.logIt("Save setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 				END IF
 			END IF
 			EXIT DIALOG
@@ -200,7 +201,7 @@ FUNCTION main_dialog()
 			IF fgl_winQuestion("Confirm","Delete setlist?","No","Yes|No","question",0) = "Yes" THEN
 				CALL del_setlist()
 			ELSE
-				CALL log("Delete setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
+				CALL log.logIt("Delete setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 			END IF
 	END DIALOG
 
@@ -270,7 +271,7 @@ FUNCTION get_setlist()
 	DEFINE l_song RECORD LIKE songs.*
 	DEFINE l_listitem t_listitem
 	LET l_cnt = 0
-	CALL log( "Getting setlist Id:"||NVL(m_setlist_id,"NULL"))
+	CALL log.logIt( "Getting setlist Id:"||NVL(m_setlist_id,"NULL"))
 	CALL m_setlist.clear()
 	SELECT * INTO m_setlist_rec.* FROM setlist sl WHERE sl.id = m_setlist_id
 	DECLARE sl2_cur CURSOR FOR
@@ -346,7 +347,7 @@ FUNCTION new_setlist()
 	INSERT INTO setlist ( name ) VALUES( l_name )
 	CALL m_setlist.clear()
 	CALL cb_setlist(m_cb_setlist)
-	CALL log( "New setlist Id:"||m_setlist_id||" Name:"||l_name)
+	CALL log.logIt( "New setlist Id:"||m_setlist_id||" Name:"||l_name)
 	LET m_setlist_rec.name = l_name
 	LET m_saved = FALSE
 
@@ -355,7 +356,7 @@ END FUNCTION
 FUNCTION del_setlist()
 
 	IF m_setlist_id IS NOT NULL THEN
-		CALL log( "Delete setlist Id:"||m_setlist_id)
+		CALL log.logIt( "Delete setlist Id:"||m_setlist_id)
 		DELETE FROM setlist WHERE id = m_setlist_id
 		DELETE FROM setlist_song WHERE setlist_id = m_setlist_id
 		MESSAGE "Setlist Deleted."
@@ -368,7 +369,7 @@ END FUNCTION
 FUNCTION save_setlist()
 	DEFINE x SMALLINT
 
-	CALL log( "Saving setlist Id:"||NVL(m_setlist_id,"NULL"))
+	CALL log.logIt( "Saving setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DELETE FROM setlist_song WHERE setlist_id = m_setlist_id
 	FOR x = 1 TO m_setlist.getLength()
 		INSERT INTO setlist_song VALUES( m_setlist_id, m_setlist[x].id, x )
@@ -518,13 +519,13 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 
 	INITIALIZE l_sax_handler TO NULL
 	IF l_filename IS NOT NULL AND l_output_format IS NOT NULL THEN
-		LET l_sax_handler = configureReport(l_filename || '.4rp', l_output_format, TRUE, FALSE)
+		LET l_sax_handler = prn_lib.configureReport(l_filename || '.4rp', l_output_format, TRUE, FALSE)
 	END IF
 
-	CALL log(" Start Report ..." )
+	CALL log.logIt(" Start Report ..." )
 	START REPORT report_name TO XML HANDLER l_sax_handler
 	--FOR i = 1 TO 10
-	CALL log(" Outputing to Report ..." )
+	CALL log.logIt(" Outputing to Report ..." )
 
 	LET l_pg = 1
 	IF l_setList THEN
@@ -545,10 +546,10 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 			OUTPUT TO REPORT report_name( l_pg, x, l_song.*, l_dur )
 		END FOR
 	END IF
-	CALL log(" Outputed to Report." )
+	CALL log.logIt(" Outputed to Report." )
 
 	--END FOR
-	CALL log(" Finish Report ..." )
+	CALL log.logIt(" Finish Report ..." )
 	FINISH REPORT report_name
 
 --&endif

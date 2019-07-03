@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<APPLICATION Parent="ws.default"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:noNamespaceSchemaLocation="http://www.4js.com/ns/gas/3.20/cfextws.xsd">
+    <EXECUTION>
+      <ENVIRONMENT_VARIABLE Id="FGLSQLDEBUG">0</ENVIRONMENT_VARIABLE>
+      <ENVIRONMENT_VARIABLE Id="FGLWSDEBUG">0</ENVIRONMENT_VARIABLE>
+			<ENVIRONMENT_VARIABLE Id="FGLPROFILE">../etc/fglprofile.pgs</ENVIRONMENT_VARIABLE>
+			<ENVIRONMENT_VARIABLE Id="FGLRESOURCEPATH">../etc</ENVIRONMENT_VARIABLE>
+			<ENVIRONMENT_VARIABLE Id="DBDATE">DMY4/</ENVIRONMENT_VARIABLE>
+			<ENVIRONMENT_VARIABLE Id="LOGDIR">../../logs</ENVIRONMENT_VARIABLE>
+      <PATH>$(res.deployment.path)</PATH>
+      <MODULE>ws_setList</MODULE>
+      <POOL>
+        <START>3</START>
+        <MIN_AVAILABLE>3</MIN_AVAILABLE>
+        <MAX_AVAILABLE>10</MAX_AVAILABLE>
+      </POOL>
+    </EXECUTION>
+</APPLICATION>

@@ -1,5 +1,8 @@
 -- Generic reporting program
 IMPORT os
+IMPORT FGL log
+IMPORT FGL prn_lib
+
 DEFINE m_preview BOOLEAN
 DEFINE m_text STRING
 DEFINE m_filename STRING
@@ -7,7 +10,7 @@ MAIN
 
 	CALL STARTLOG(base.application.getProgramName()||".err")
 
-	CALL log(" Running ..." )
+	CALL log.logIt(" Running ..." )
 	LET m_filename = os.path.join(os.path.pwd(),"front250")
 	LET m_filename = os.path.join(os.path.pwd(),"back250")
 
@@ -18,7 +21,7 @@ MAIN
 	LET m_preview = FALSE
 
 	CALL runReport(m_filename, "SVG")
-	CALL log(" Finished." )
+	CALL log.logIt(" Finished." )
 END MAIN
 --------------------------------------------------------------------------------
 FUNCTION runReport(filename, output_format)
@@ -29,19 +32,19 @@ DEFINE
 
 	INITIALIZE sax_handler TO NULL
 	IF filename IS NOT NULL AND output_format IS NOT NULL THEN
-		LET sax_handler = configureReport(filename || '.4rp', output_format, m_preview, FALSE)
+		LET sax_handler = prn_lib.configureReport(filename || '.4rp', output_format, m_preview, FALSE)
 	END IF
 
-	CALL log(" Start Report ..." )
+	CALL log.logIt(" Start Report ..." )
 	START REPORT report_name TO XML HANDLER sax_handler
 	--FOR i = 1 TO 10
-	CALL log(" Outputing to Report ..." )
+	CALL log.logIt(" Outputing to Report ..." )
 
 	OUTPUT TO REPORT report_name()
-	CALL log(" Outputed to Report." )
+	CALL log.logIt(" Outputed to Report." )
 
 	--END FOR
-	CALL log(" Finish Report ..." )
+	CALL log.logIt(" Finish Report ..." )
 	FINISH REPORT report_name
 
     

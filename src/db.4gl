@@ -1,4 +1,5 @@
 IMPORT os
+IMPORT FGL log
 
 DEFINE m_db VARCHAR(60)
 DEFINE m_dbname VARCHAR(20)
@@ -27,7 +28,7 @@ FUNCTION connect(l_db)
 		LET m_db = m_dbname
 	END IF
 
-	CALL log( SFMT("Connecting to DB: %1 Driver: %2",m_dbname,m_dbtype))
+	CALL log.logIt( SFMT("Connecting to DB: %1 Driver: %2",m_dbname,m_dbtype))
 	TRY
 		CONNECT TO m_dbname
 	CATCH
@@ -38,13 +39,13 @@ FUNCTION connect(l_db)
 	IF l_created_db THEN
 		CALL load()
 	END IF
-	CALL log( "Connected to DB:"||NVL(m_dbname,"NULL"))
+	CALL log.logIt( "Connected to DB:"||NVL(m_dbname,"NULL"))
 
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION drop()
 
-	CALL log( "Dropping Tables, DB:"||NVL(m_db,"NULL"))
+	CALL log.logIt( "Dropping Tables, DB:"||NVL(m_db,"NULL"))
 
 	IF m_dbtype = "dbmsqt" THEN
 		CREATE DATABASE m_db
@@ -66,7 +67,7 @@ END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION create()
 
-	CALL log( "Creating DB:"||NVL(m_db,"NULL"))
+	CALL log.logIt( "Creating DB:"||NVL(m_db,"NULL"))
 
 	IF m_dbtype = "dbmsqt" THEN
 		CREATE DATABASE m_db
@@ -125,7 +126,7 @@ FUNCTION newload()
 	DEFINE l_file STRING
 
 	LET l_file =  "songs.unl"
-	CALL log( "Loading Data from:"||l_file)
+	CALL log.logIt( "Loading Data from:"||l_file)
 	LOAD FROM l_file INSERT INTO songs ( 
 												titl, 
 												artist, 
@@ -151,11 +152,11 @@ FUNCTION newload()
 	UPDATE songs SET tuning = "S" WHERE tuning IS NULL;
 
 	LET l_file =  "setlist.unl"
-	CALL log( "Loading Data from:"||l_file)
+	CALL log.logIt( "Loading Data from:"||l_file)
 	LOAD FROM l_file INSERT INTO setlist (id, name )
 
 	LET l_file =  "setlist_song.unl"
-	CALL log( "Loading Data from:"||l_file)
+	CALL log.logIt( "Loading Data from:"||l_file)
 	LOAD FROM l_file INSERT INTO setlist_song (setlist_id,
 												song_id,
 												seq_no
@@ -200,7 +201,7 @@ FUNCTION backup()
 	LET l_dbbackup = os.path.join( os.path.dirname(os.path.pwd()),"db_backup")
 	IF NOT os.path.exists(l_dbbackup) THEN
 		IF NOT os.path.mkdir(l_dbbackup) THEN
-			CALL log( SFMT("Failed to make backup dir '%1'",l_dbbackup) )
+			CALL log.logIt( SFMT("Failed to make backup dir '%1'",l_dbbackup) )
 		END IF
 	END IF
 	--LET l_dbbackup = os.path.join( l_dbbackup,"test" )
@@ -210,16 +211,16 @@ FUNCTION backup()
 	LET l_tim = l_tim[1,2]||l_tim[4,5]||l_tim[7,8]
 	LET l_dbbackup = os.path.join( l_dbbackup,(TODAY USING "YYYYMMDD")||"-"||l_tim CLIPPED)
 	LET l_back = l_dbbackup.append("-songs.unl")
-	CALL log( "Back up songs to "||NVL(l_back,"NULL"))
+	CALL log.logIt( "Back up songs to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM songs
 	LET l_back = l_dbbackup.append("-setlist.unl")
-	CALL log( "Back up setlist to "||NVL(l_back,"NULL"))
+	CALL log.logIt( "Back up setlist to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM setlist
 	LET l_back = l_dbbackup.append("-setlist_song.unl")
-	CALL log( "Back up setlist_song to "||NVL(l_back,"NULL"))
+	CALL log.logIt( "Back up setlist_song to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM setlist_song
 	LET l_back = l_dbbackup.append("-setlist_hist.unl")
-	CALL log( "Back up setlist_hist to "||NVL(l_back,"NULL"))
+	CALL log.logIt( "Back up setlist_hist to "||NVL(l_back,"NULL"))
 	UNLOAD TO l_back SELECT * FROM setlist_hist
 END FUNCTION
 ----------------------------------------------------------------------------------------------------

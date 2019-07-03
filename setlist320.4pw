@@ -64,7 +64,7 @@
   </Settings>
   <LanguageList version="1.0"/>
   <PlatformList version="1.0"/>
-  <Group environment="value:FONTDIR=/home/neilm/fonts,value:FGLPROFILE=../etc/fglprofile.pgs,value:FGLIMAGEPATH=../pics:../pics/image2font.txt" id="-755569125" label="SetList" language="Genero">
+  <Group environment="value:FONTDIR=/home/neilm/fonts,value:FGLPROFILE=../etc/fglprofile.sqt,value:FGLIMAGEPATH=../pics:../pics/image2font.txt" id="-755569125" label="SetList" language="Genero">
     <Library binaryName="Databases" id="1986" label="Databases">
       <File filePath="etc/songs.4db"/>
     </Library>
@@ -76,6 +76,7 @@
     </Library>
     <Library binaryName="gas" id="452154458" label="gas">
       <File filePath="gas_deploy/setlist.xcf"/>
+      <File filePath="gas_deploy/ws_setlist.xcf"/>
     </Library>
     <Library binaryName="lib" id="-620758080" label="lib">
       <File filePath="src/db.4gl"/>
@@ -106,6 +107,11 @@
     </Application>
     <Application binaryName="test" dependencies="-620758080" id="1064918672" label="test">
       <File filePath="src/test.4gl"/>
+    </Application>
+    <Application binaryName="ws_setList" dependencies="-620758080,452154458,1986,1810934636" id="2126940491" label="ws_setList">
+      <File filePath="src/g2_ws.4gl"/>
+      <File filePath="src/ws_setList.4gl"/>
+      <File filePath="src/ws_setListMain.4gl"/>
     </Application>
   </Group>
 </Project>

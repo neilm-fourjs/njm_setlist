@@ -2,7 +2,7 @@ IMPORT os
 DEFINE m_logDir STRING
 DEFINE m_logFile STRING
 --------------------------------------------------------------------------------
-FUNCTION log( l_str )
+FUNCTION logIt( l_str )
 	DEFINE l_str STRING
 	DEFINE c base.channel
 	IF m_logDir IS NULL THEN LET m_logDir = fgl_getEnv("LOGDIR") END IF
