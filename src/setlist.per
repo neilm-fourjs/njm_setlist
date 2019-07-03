@@ -25,24 +25,6 @@ HBOX ( SPLITTER )
 VBOX
 GRID ( STYLE="darkred" )
 {
-[b0|master                            ][b1|b2|b3|b4|b5]
-}
-END -- GRID
-TABLE (DOUBLECLICK=addtosetlist)
-{
-[no1][titl                    ][tim   ][t1][k1]
-[no1][titl                    ][tim   ][t1][k1]
-[no1][titl                    ][tim   ][t1][k1]
-[no1][titl                    ][tim   ][t1][k1]
-[no1][titl                    ][tim   ][t1][k1]
-                               [tot   ]
-}
-END -- TABLE
-END -- VBOX
-
-VBOX
-GRID ( STYLE="darkred" )
-{
 [setlist:s001               ][s1|s2|s3|s4|s5|s6|s7]
 }
 END -- GRID
@@ -54,6 +36,24 @@ TABLE
 [no2][atitl                    ][atim  ][t2][k2]
 [no2][atitl                    ][atim  ][t2][k2]
                                 [atot  ]
+}
+END -- TABLE
+END -- VBOX
+
+VBOX
+GRID ( STYLE="darkred" )
+{
+[master                            ][b1|b2|b3|b4|b5]
+}
+END -- GRID
+TABLE (DOUBLECLICK=addtosetlist)
+{
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+[no1][titl                    ][tim   ][t1][k1]
+                               [tot   ]
 }
 END -- TABLE
 END -- VBOX
@@ -83,7 +83,6 @@ END -- GRID
 END -- HBOX
 
 ATTRIBUTES
-BUTTON b0 : exit,TEXT="";
 LABEL master : master, TEXT="Master Song List", STYLE="darkred";
 BUTTON b1 : insert,TEXT="";
 BUTTON b2 : update,TEXT="";
