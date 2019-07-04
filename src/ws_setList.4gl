@@ -14,6 +14,7 @@ PUBLIC FUNCTION init()
 	CALL STARTLOG( log.errorLogName() )
   CALL db.connect("songs")
 	WHENEVER ERROR CALL log.error_log
+	LET g2_ws.m_server = fgl_getEnv("HOSTNAME")
   CALL log.logIt("Service started.")
   CALL g2_ws.start("ws_setList", "ws_setList")
 END FUNCTION

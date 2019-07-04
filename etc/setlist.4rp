@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="30a09" version="6.00">
+<report:Report xmlns:rtl="http://www.4js.com/2004/RTL" xmlns:report="http://www.4js.com/2007/REPORT" xmlns="http://www.4js.com/2004/PXML" gstVersion="31405" version="6.00">
     <report:Settings RWPageWidth="a4width" RWPageLength="a4length" RWLeftMargin="1.3cm" RWTopMargin="1.00cm" RWRightMargin="1.3cm" RWBottomMargin="1.00cm">
         <report:FormatList>
             <report:Format-SVG/>
@@ -12,6 +12,7 @@
     <rtl:stylesheet>
         <PXML>
             <rtl:match name="Report" nameConstraint="Report" minOccurs="1" maxOccurs="1">
+                <rtl:match name="FirstPageHeader" nameConstraint="FirstPageHeader" minOccurs="0" maxOccurs="1"/>
                 <rtl:match name="Group l_pg" nameConstraint="Group" minOccurs="0" maxOccurs="unbounded">
                     <MINIPAGE name="Page Root" width="max" length="max" color="#381fef" fontName="Arial" borderWidth="1">
                         <LAYOUTNODE name="Page Header" width="max" length="min" port="anyPageHeader">

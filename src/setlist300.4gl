@@ -3,6 +3,8 @@ IMPORT os
 IMPORT FGL log
 IMPORT FGL db
 IMPORT FGL prn_lib
+IMPORT FGL lib
+
 SCHEMA songs
 
 CONSTANT C_BREAK = "    *** BREAK *** "
@@ -22,32 +24,37 @@ DEFINE m_saved, m_filter_list, m_filter_learnt BOOLEAN
 DEFINE m_setlist_id INTEGER
 DEFINE m_setlist_rec RECORD LIKE setlist.*
 DEFINE m_cb_setlist ui.ComboBox
+DEFINE m_use_db BOOLEAN
 MAIN
 
 	LET m_filter_list = FALSE
+	LET m_use_db = TRUE
 
 	CALL STARTLOG( log.errorLogName() )
 	CALL log.logIt( "Current Directory:"||os.path.pwd() )
 
-	CALL db.connect("songs")
-
-	CASE ARG_VAL(1)
-		WHEN "drop" CALL db.drop()
-		WHEN "create" CALL db.create()
-		WHEN "newload" CALL db.newload()
-		WHEN "load" CALL db.load()
-		WHEN "unload" CALL db.unload()
-	END CASE
-
-	CALL get_songs()
+	IF m_use_db THEN
+		CALL db.connect("songs")
+		CASE ARG_VAL(1)
+			WHEN "drop" CALL db.drop()
+			WHEN "create" CALL db.create()
+			WHEN "newload" CALL db.newload()
+			WHEN "load" CALL db.load()
+			WHEN "unload" CALL db.unload()
+		END CASE
+	END IF
 
 	OPEN FORM f FROM "setlist"
 	DISPLAY FORM f
 
+	CALL get_songs()
+	CALL get_setlist()
+
 	CALL main_dialog()
 
-	CALL db.backup()
-
+	IF m_use_db THEN
+		CALL db.backup()
+	END IF
 END MAIN
 --------------------------------------------------------------------------------
 FUNCTION main_dialog()
@@ -56,7 +63,6 @@ FUNCTION main_dialog()
 	DEFINE x SMALLINT
 	DEFINE l_rec t_listitem
 
-	CALL get_setlist()
 	CALL filter(__LINE__)
 	CALL log.logIt( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
@@ -331,7 +337,6 @@ END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION new_setlist()
 	DEFINE l_name VARCHAR(20)
-	DEFINE l_id INTEGER
 
 	LET int_flag = FALSE
 	PROMPT "Enter Name for Set List:" FOR l_name
@@ -341,9 +346,6 @@ FUNCTION new_setlist()
 		CALL fgl_winMessage("Error","Set List already exists!","exclamation")
 		RETURN
 	END IF
-{	SELECT MAX( id ) INTO l_id FROM setlist
-	LET l_id = l_id + 1
-	INSERT INTO setlist ( id, name ) VALUES( l_id, l_name )}
 	INSERT INTO setlist ( name ) VALUES( l_name )
 	CALL m_setlist.clear()
 	CALL cb_setlist(m_cb_setlist)
@@ -474,23 +476,6 @@ FUNCTION calc_tots(l_line SMALLINT)
 		END IF
 	END FOR
 	DISPLAY sec_to_time( l_tot, TRUE )||"("||l_cnt||")" TO l_atot
-END FUNCTION
---------------------------------------------------------------------------------
-FUNCTION sec_to_time( l_sec, l_hours )
-	DEFINE l_hours BOOLEAN
-	DEFINE l_sec, l_min, l_hour SMALLINT
-	DEFINE l_tim CHAR(7)
-	IF l_sec = 0 OR l_sec IS NULL THEN RETURN NULL END IF
-	LET l_min = l_sec / 60
-	LET l_sec = l_sec - ( l_min*60 )
-	LET l_hour = l_min / 60
-	LET l_min = l_min - ( l_hour*60 )
-	IF l_hours THEN
-		LET l_tim = l_hour USING "&",":",l_min USING "#&",":",l_sec USING "&&"
-	ELSE
-		LET l_tim = l_min USING "#&",":",l_sec USING "&&"
-	END IF
-	RETURN l_tim
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION disp_song( l_id )

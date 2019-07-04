@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Project defaultApplication="18736" gstVersion="31405" version="3.3">
+<Project defaultApplication="1851630676" gstVersion="31405" version="3.3">
   <Settings>
     <DynamicProperties version="2">
       <DynamicProperty description="Accent color (Android 5.0 and later)" initialValue="#9575CD" isDefaultInherited="false" isHidden="false" label="Accent color" name="gma-accent-color" readOnly="false" type="COLOR"/>
@@ -80,6 +80,7 @@
     </Library>
     <Library binaryName="lib" id="-620758080" label="lib">
       <File filePath="src/db.4gl"/>
+      <File filePath="src/lib.4gl"/>
       <File filePath="src/log.4gl"/>
     </Library>
     <Application binaryName="marketing" commandLineArguments="https://facebook.com/offtherailsduo" dependencies="1268305552,1810934636,-620758080" id="2140468318" label="marketing">
@@ -102,8 +103,13 @@
       <File filePath="etc/songlist.4rp"/>
     </Library>
     <Application binaryName="setlist" dependencies="1986,-620758080,1268305552" id="18736" label="setlist">
-      <File compilerOptions="--build-rdd" filePath="src/setlist.4gl"/>
       <File filePath="src/setlist.per"/>
+      <File compilerOptions="--build-rdd" filePath="src/setlist300.4gl"/>
+    </Application>
+    <Application binaryName="setlist2" dependencies="-620758080,1986,1268305552" id="1851630676" label="setlist2">
+      <File filePath="src/main.4gl"/>
+      <File filePath="src/setList.4gl"/>
+      <File filePath="src/songs.4gl"/>
     </Application>
     <Application binaryName="test" dependencies="-620758080" id="1064918672" label="test">
       <File filePath="src/test.4gl"/>
