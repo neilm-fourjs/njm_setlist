@@ -3,3 +3,6 @@
 dbi.default.driver = "dbmpgs"
 
 dbi.database.songs.ifxemul.datatype.serial.emulation = "native"
+
+# WS
+security.global.ca = "../etc/CABundle.pem"

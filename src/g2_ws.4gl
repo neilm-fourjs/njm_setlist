@@ -64,14 +64,30 @@ PUBLIC FUNCTION service_reply(l_stat INT, l_reply STRING) RETURNS STRING
 	IF l_reply.getCharAt(1) = "{" THEN -- assume it's JSON
 		TRY
 			LET ws_response.data = util.JSONObject.parse(l_reply)
-			LET l_reply = "JSON"
+			IF l_reply.getCharAt(2) = "[" THEN
+				LET l_reply = "JSONArray"
+			ELSE
+				LET l_reply = "JSON"
+			END IF
 		CATCH
 			LET ws_response.data = util.JSONObject.parse("{\"Error\": \"invalid JSON!\"}")
 		END TRY
 	END IF
+
 	LET ws_response.description = l_reply
 	LET ws_response.server = m_server
 	LET ws_response.timestamp = CURRENT
 	LET ws_response.status = l_stat
   RETURN util.json.stringify( ws_response )
+END FUNCTION
+----------------------------------------------------------------------------------------------------
+-- Format the string reply from the service function
+PUBLIC FUNCTION service_reply_unpack(l_stat INT, l_reply STRING) RETURNS (INT, STRING)
+	IF l_stat != 0 THEN
+		CALL fgl_winMessage("WS Error",SFMT("Stat: %1 - %2", l_stat, "eh"),"exclamation")
+		RETURN l_stat, l_reply
+	END IF
+	DISPLAY "g2_ws: Stat:",l_stat, " Reply:",l_reply
+	CALL util.JSON.parse( l_reply, ws_response)
+  RETURN ws_response.status, ws_response.data.toString()
 END FUNCTION

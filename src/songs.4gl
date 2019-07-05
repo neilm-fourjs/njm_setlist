@@ -1,5 +1,8 @@
 
+IMPORT util
 IMPORT FGL lib
+IMPORT FGL g2_ws
+IMPORT FGL cli_setlist
 
 SCHEMA songs
 
@@ -43,13 +46,43 @@ FUNCTION (this songs) getFromDB() RETURNS ()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this songs) getFromServer(l_server STRING) RETURNS ()
-	DEFINE l_song RECORD LIKE songs.*
+	DEFINE x, y SMALLINT
+	DEFINE l_ws_stat SMALLINT
+	DEFINE l_ws_reply STRING
+	DEFINE l_responsePages RECORD
+		pages SMALLINT
+	END RECORD
+	DEFINE l_responseSongs RECORD
+	  arr DYNAMIC ARRAY OF RECORD LIKE songs.*
+	END RECORD
+	LET cli_setlist.Endpoint.Address.Uri = l_server
+
 	CALL this.arr.clear()
 	CALL this.list.clear()
 	LET this.len = 0
+
+	DISPLAY "Getting pages for songs list ..."
+	CALL cli_setlist.pagesSongs() RETURNING l_ws_stat, l_ws_reply
+	CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
+	DISPLAY "Stat:", l_ws_stat," Reply:",l_ws_reply
+
+	CALL util.JSON.parse(l_ws_reply, l_responsePages )
+	DISPLAY "Pages:",l_responsePages.pages
+	FOR x = 1 TO l_responsePages.pages
+		CALL cli_setlist.listSongs(x) RETURNING l_ws_stat, l_ws_reply
+		CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
+		DISPLAY "Stat:", l_ws_stat," Reply:",l_ws_reply
+		CALL util.JSON.parse(l_ws_reply, l_responseSongs )
+		FOR y = 1 TO l_responseSongs.arr.getLength()
+			LET this.len = this.len + 1
+			LET this.arr[ this.len ].* = l_responseSongs.arr[y].*
+			CALL this.set_listItem( this.len )
+		END FOR
+	END FOR
+
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this songs)getSong( l_id INTEGER, l_song RECORD LIKE songs.* INOUT )
+FUNCTION (this songs) getSong( l_id INTEGER, l_song RECORD LIKE songs.* INOUT )
 	DEFINE x SMALLINT
 	INITIALIZE l_song.* TO NULL
 	FOR x = 1 TO this.len

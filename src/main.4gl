@@ -1,4 +1,8 @@
 
+-- Idea - can I use an INTERFACE to the class for DB vs WS ?
+
+
+
 IMPORT os
 IMPORT FGL log
 IMPORT FGL db
@@ -8,7 +12,6 @@ IMPORT FGL songs
 IMPORT FGL setList
 
 SCHEMA songs
-
 
 DEFINE m_filter_listed DYNAMIC ARRAY OF songs.t_listitem
 DEFINE m_saved, m_filter_list, m_filter_learnt BOOLEAN
@@ -21,7 +24,7 @@ DEFINE m_server STRING
 MAIN
 
 	LET m_filter_list = FALSE
-	LET m_server = fgl_getEnv("SERVER")
+	LET m_server = fgl_getEnv("WSSERVER")
 	IF m_server IS NULL OR m_server.getLength() < 2 THEN
 		LET m_use_db = TRUE
 	END IF

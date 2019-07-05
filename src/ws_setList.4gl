@@ -44,9 +44,11 @@ PUBLIC FUNCTION listSongs(
     l_pgno SMALLINT ATTRIBUTES(WSParam))
     ATTRIBUTES(WSGet, WSPath = "/listSongs/{l_pgno}", WSDescription = "Get Song List")
     RETURNS STRING
-  DEFINE l_arr DYNAMIC ARRAY OF RECORD LIKE songs.*
+	DEFINE response RECORD
+		arr DYNAMIC ARRAY OF RECORD LIKE songs.*
+	END RECORD
   DEFINE x, y SMALLINT
-  DECLARE songcur SCROLL CURSOR FOR SELECT * FROM songs
+  DECLARE songcur SCROLL CURSOR FOR SELECT * FROM songs ORDER BY titl
   IF l_pgno IS NULL THEN
     LET l_pgno = 1
   END IF
@@ -54,17 +56,18 @@ PUBLIC FUNCTION listSongs(
   LET y = 1
   LET x = ((l_pgno - 1) * c_itemsPerPage) + 1
   WHILE STATUS != NOTFOUND
-    DISPLAY "Row:", x
-    FETCH ABSOLUTE x songcur INTO l_arr[y].*
+    FETCH ABSOLUTE x songcur INTO response.arr[y].*
+    IF y = c_itemsPerPage OR STATUS = NOTFOUND THEN EXIT WHILE END IF
+    DISPLAY "Row:", x," Titl:", response.arr[y].titl
     LET y = y + 1
     LET x = x + 1
-    IF y = c_itemsPerPage THEN
-      EXIT WHILE
-    END IF
   END WHILE
+	IF response.arr[ response.arr.getLength() ].titl IS NULL THEN
+		CALL response.arr.deleteElement( response.arr.getLength() )
+	END IF
   CLOSE songcur
-  CALL log.logIt( SFMT("listSongs: %1", l_arr.getLength()))
-  RETURN g2_ws.service_reply(0, util.JSONArray.fromFGL(l_arr).toString())
+  CALL log.logIt( SFMT("listSongs: %1", response.arr.getLength()))
+  RETURN g2_ws.service_reply(0, util.JSONObject.fromFGL(response).toString())
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
 -- get no of pages for setLists
@@ -115,7 +118,7 @@ PUBLIC FUNCTION getSetList(
     ATTRIBUTES(WSGet, WSPath = "/getSetList/{l_id}", WSDescription = "Get SetList List")
     RETURNS STRING
   DEFINE l_arr DYNAMIC ARRAY OF RECORD LIKE setlist_song.*
-  DECLARE slscur SCROLL CURSOR FOR SELECT * FROM setlist_song WHERE setlist_id = l_id
+  DECLARE slscur SCROLL CURSOR FOR SELECT * FROM setlist_song WHERE setlist_id = l_id ORDER BY seq_no
   FOREACH slscur INTO l_arr[ l_arr.getLength() + 1 ].*
 	END FOREACH
 	CALL l_arr.deleteElement( l_arr.getLength() )
