@@ -62,6 +62,8 @@ FUNCTION main_dialog()
 	DEFINE x SMALLINT
 	DEFINE l_rec songs.t_listitem
 
+	IF m_setlist_id IS NULL OR m_setlist_id = 0 THEN LET m_setlist_id = m_setlist.arrLen END IF
+	CALL m_setlist.getList(m_server, m_setlist_id, m_songs )
 	CALL filter(__LINE__)
 	CALL log.logIt( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
@@ -99,11 +101,7 @@ FUNCTION main_dialog()
 
 		INPUT BY NAME m_setlist_id ATTRIBUTES(WITHOUT DEFAULTS)
 			ON CHANGE m_setlist_id
-				IF m_use_db THEN
-					CALL m_setlist.getListFromDB( m_setlist_id )
-				ELSE
-					CALL m_setlist.getListFromServer( m_setlist_id, m_server )
-				END IF
+				CALL m_setlist.getList(m_server, m_setlist_id, m_songs )
 		END INPUT
 
 		DISPLAY ARRAY m_setlist.list TO tab2.*

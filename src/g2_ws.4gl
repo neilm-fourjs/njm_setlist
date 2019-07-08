@@ -84,10 +84,11 @@ END FUNCTION
 -- Format the string reply from the service function
 PUBLIC FUNCTION service_reply_unpack(l_stat INT, l_reply STRING) RETURNS (INT, STRING)
 	IF l_stat != 0 THEN
-		CALL fgl_winMessage("WS Error",SFMT("Stat: %1 - %2", l_stat, "eh"),"exclamation")
+		LET l_reply = SFMT("Error Stat: %1 Status: %2 : %3", l_stat, STATUS, ERR_GET(STATUS))
+		DISPLAY l_reply
 		RETURN l_stat, l_reply
 	END IF
-	DISPLAY "g2_ws: Stat:",l_stat, " Reply:",l_reply
+	DISPLAY "g2_ws: Stat:",l_stat, " Reply Len:",l_reply.getLength()
 	CALL util.JSON.parse( l_reply, ws_response)
   RETURN ws_response.status, ws_response.data.toString()
 END FUNCTION

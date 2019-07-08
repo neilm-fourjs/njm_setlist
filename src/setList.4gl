@@ -1,6 +1,9 @@
+IMPORT util
 IMPORT FGL lib
 IMPORT FGL log
 IMPORT FGL songs
+IMPORT FGL cli_setlist
+IMPORT FGL g2_ws
 SCHEMA songs
 
 PUBLIC CONSTANT C_BREAK = "    *** BREAK *** "
@@ -33,6 +36,15 @@ FUNCTION (this setList) get(l_server STRING, l_songs songs) RETURNS ()
 		CALL this.getFromDB()
 	ELSE
 		CALL this.getFromServer(l_server)
+	END IF
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION (this setList) getList(l_server STRING, l_id INTEGER, l_songs songs) RETURNS ()
+	LET m_songs = l_songs
+	IF l_server IS NULL THEN
+		CALL this.getListFromDB(l_id)
+	ELSE
+		CALL this.getListFromServer(l_server, l_id)
 	END IF
 END FUNCTION
 --------------------------------------------------------------------------------
@@ -86,12 +98,73 @@ FUNCTION (this setList) addBreak() RETURNS ()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) getFromServer(l_server STRING) RETURNS ()
+	DEFINE x, y SMALLINT
+	DEFINE l_ws_stat SMALLINT
+	DEFINE l_ws_reply STRING
+	DEFINE l_responsePages RECORD
+		pages SMALLINT
+	END RECORD
+	DEFINE l_responseLists RECORD
+	  arr DYNAMIC ARRAY OF RECORD LIKE setlist.*,
+		len SMALLINT
+	END RECORD
+	LET cli_setlist.Endpoint.Address.Uri = l_server
 	CALL this.arr.clear()
 	LET this.arrLen = 0
+
+	DISPLAY "Getting pages for setlist list ..."
+	CALL cli_setlist.pagesSetLists() RETURNING l_ws_stat, l_ws_reply
+	CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
+	DISPLAY "Setlist Pages Stat:", l_ws_stat," Reply:",l_ws_reply
+	IF l_ws_stat != 0 THEN 
+		CALL fgl_winMessage("WS Error",l_ws_reply,"exclamation")
+		RETURN
+	END IF
+	CALL util.JSON.parse(l_ws_reply, l_responsePages )
+	DISPLAY "Setlist Pages:",l_responsePages.pages
+
+	FOR x = 1 TO l_responsePages.pages
+		CALL cli_setlist.listSetLists(x) RETURNING l_ws_stat, l_ws_reply
+		CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
+		DISPLAY "Setlists Stat:", l_ws_stat," Reply:",l_ws_reply
+		IF l_ws_stat != 0 THEN 
+			CALL fgl_winMessage("WS Error",l_ws_reply,"exclamation")
+			RETURN
+		END IF
+		CALL util.JSON.parse(l_ws_reply, l_responseLists )
+		FOR y = 1 TO l_responseLists.len
+			LET this.arrLen = this.arrLen + 1
+			LET this.arr[ this.arrLen ].* = l_responseLists.arr[y].*
+		END FOR
+	END FOR
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) getListFromServer( l_server STRING, l_id INTEGER ) RETURNS ()
+	DEFINE x, y SMALLINT
+	DEFINE l_ws_stat SMALLINT
+	DEFINE l_ws_reply STRING
+	DEFINE l_responseLists RECORD
+	  arr DYNAMIC ARRAY OF RECORD LIKE setlist_song.*,
+		len SMALLINT
+	END RECORD
+	LET cli_setlist.Endpoint.Address.Uri = l_server
 
+	CALL cli_setlist.getSetList(l_id) RETURNING l_ws_stat, l_ws_reply
+	CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
+	IF l_ws_stat != 0 THEN 
+		CALL fgl_winMessage("WS Error",l_ws_reply,"exclamation")
+		RETURN
+	END IF
+	DISPLAY "Setlist songs Stat:", l_ws_stat," Reply:",l_ws_reply
+	CALL util.JSON.parse(l_ws_reply, l_responseLists )
+	FOR y = 1 TO l_responseLists.len
+		LET this.listLen = this.listLen + 1
+			FOR x = 1 TO m_songs.len
+				IF m_songs.list[x].id = l_responseLists.arr[y].song_id THEN
+					LET this.list[ this.listLen ].* = m_songs.list[x].*
+				END IF
+			END FOR
+	END FOR
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) new() RETURNS()

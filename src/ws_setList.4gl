@@ -45,7 +45,8 @@ PUBLIC FUNCTION listSongs(
     ATTRIBUTES(WSGet, WSPath = "/listSongs/{l_pgno}", WSDescription = "Get Song List")
     RETURNS STRING
 	DEFINE response RECORD
-		arr DYNAMIC ARRAY OF RECORD LIKE songs.*
+		arr DYNAMIC ARRAY OF RECORD LIKE songs.*,
+		len SMALLINT
 	END RECORD
   DEFINE x, y SMALLINT
   DECLARE songcur SCROLL CURSOR FOR SELECT * FROM songs ORDER BY titl
@@ -66,6 +67,7 @@ PUBLIC FUNCTION listSongs(
 		CALL response.arr.deleteElement( response.arr.getLength() )
 	END IF
   CLOSE songcur
+	LET response.len = response.arr.getLength()
   CALL log.logIt( SFMT("listSongs: %1", response.arr.getLength()))
   RETURN g2_ws.service_reply(0, util.JSONObject.fromFGL(response).toString())
 END FUNCTION
@@ -74,12 +76,14 @@ END FUNCTION
 PUBLIC FUNCTION pagesSetLists()
     ATTRIBUTES(WSGet, WSPath = "/pagesSetLists", WSDescription = "Get No of Pages of SetLists")
     RETURNS STRING
+	DEFINE x SMALLINT
 	DEFINE response RECORD
 		pages SMALLINT
 	END RECORD
-	SELECT COUNT(*) INTO response.pages FROM setlist
-	LET response.pages = response.pages / c_itemsPerPage
+	SELECT COUNT(*) INTO x FROM setlist
+	LET response.pages = x / c_itemsPerPage
 	IF response.pages MOD c_itemsPerPage THEN LET response.pages = response.pages + 1 END IF
+	IF response.pages = 0 AND x > 0 THEN LET response.pages = 1 END IF
   CALL log.logIt( SFMT("pagesSetLists: %1", response.pages))
   RETURN g2_ws.service_reply(0, util.JSONObject.fromFGL(response).toString())
 END FUNCTION
@@ -89,7 +93,10 @@ PUBLIC FUNCTION listSetLists(
     l_pgno SMALLINT ATTRIBUTES(WSParam))
     ATTRIBUTES(WSGet, WSPath = "/listSetLists/{l_pgno}", WSDescription = "Get SetList List")
     RETURNS STRING
-  DEFINE l_arr DYNAMIC ARRAY OF RECORD LIKE setlist.*
+	DEFINE response RECORD
+		arr DYNAMIC ARRAY OF RECORD LIKE setlist.*,
+		len SMALLINT
+	END RECORD
   DEFINE x, y SMALLINT
   DECLARE slcur SCROLL CURSOR FOR SELECT * FROM setlist
   IF l_pgno IS NULL THEN
@@ -99,8 +106,9 @@ PUBLIC FUNCTION listSetLists(
   LET y = 1
   LET x = ((l_pgno - 1) * c_itemsPerPage) + 1
   WHILE STATUS != NOTFOUND
-    DISPLAY "Row:", x
-    FETCH ABSOLUTE x slcur INTO l_arr[y].*
+    FETCH ABSOLUTE x slcur INTO response.arr[y].*
+    IF y = c_itemsPerPage OR STATUS = NOTFOUND THEN EXIT WHILE END IF
+    DISPLAY "Row x:",x," y:",y, " name:",response.arr[y].name
     LET y = y + 1
     LET x = x + 1
     IF y = c_itemsPerPage THEN
@@ -108,8 +116,9 @@ PUBLIC FUNCTION listSetLists(
     END IF
   END WHILE
   CLOSE slcur
-  CALL log.logIt( SFMT("listSetLists: %1", l_arr.getLength()))
-  RETURN g2_ws.service_reply(0, util.JSONArray.fromFGL(l_arr).toString())
+	LET response.len = response.arr.getLength()
+  CALL log.logIt( SFMT("listSetLists: %1", response.arr.getLength()))
+  RETURN g2_ws.service_reply(0, util.JSONObject.fromFGL(response).toString())
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
 -- get list of setLists songs
@@ -117,16 +126,20 @@ PUBLIC FUNCTION getSetList(
     l_id SMALLINT ATTRIBUTES(WSParam))
     ATTRIBUTES(WSGet, WSPath = "/getSetList/{l_id}", WSDescription = "Get SetList List")
     RETURNS STRING
-  DEFINE l_arr DYNAMIC ARRAY OF RECORD LIKE setlist_song.*
+	DEFINE response RECORD
+		arr DYNAMIC ARRAY OF RECORD LIKE setlist_song.*,
+		len SMALLINT
+	END RECORD
   DECLARE slscur SCROLL CURSOR FOR SELECT * FROM setlist_song WHERE setlist_id = l_id ORDER BY seq_no
-  FOREACH slscur INTO l_arr[ l_arr.getLength() + 1 ].*
+  FOREACH slscur INTO response.arr[ response.arr.getLength() + 1 ].*
 	END FOREACH
-	CALL l_arr.deleteElement( l_arr.getLength() )
-  CALL log.logIt( SFMT("getSetList: %1", l_arr.getLength()))
-	IF l_arr.getLength() > 0 THEN
-  	RETURN g2_ws.service_reply(0, util.JSONArray.fromFGL(l_arr).toString())
+	CALL response.arr.deleteElement( response.arr.getLength() )
+	LET response.len = response.arr.getLength()
+  CALL log.logIt( SFMT("getSetList: %1", response.len))
+	IF response.len > 0 THEN
+  	RETURN g2_ws.service_reply(0,  util.JSONObject.fromFGL(response).toString())
 	ELSE
-  	RETURN g2_ws.service_reply(100, util.JSONArray.fromFGL(l_arr).toString())
+  	RETURN g2_ws.service_reply(100, util.JSONObject.fromFGL(response).toString() )
 	END IF
 END FUNCTION
 ----------------------------------------------------------------------------------------------------

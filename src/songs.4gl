@@ -53,7 +53,8 @@ FUNCTION (this songs) getFromServer(l_server STRING) RETURNS ()
 		pages SMALLINT
 	END RECORD
 	DEFINE l_responseSongs RECORD
-	  arr DYNAMIC ARRAY OF RECORD LIKE songs.*
+	  arr DYNAMIC ARRAY OF RECORD LIKE songs.*,
+		len SMALLINT
 	END RECORD
 	LET cli_setlist.Endpoint.Address.Uri = l_server
 
@@ -64,16 +65,25 @@ FUNCTION (this songs) getFromServer(l_server STRING) RETURNS ()
 	DISPLAY "Getting pages for songs list ..."
 	CALL cli_setlist.pagesSongs() RETURNING l_ws_stat, l_ws_reply
 	CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
-	DISPLAY "Stat:", l_ws_stat," Reply:",l_ws_reply
+	DISPLAY "Songs Pages Stat:", l_ws_stat," Reply:",l_ws_reply
+	IF l_ws_stat != 0 THEN 
+		CALL fgl_winMessage("WS Error",l_ws_reply,"exclamation")
+		RETURN
+	END IF
 
 	CALL util.JSON.parse(l_ws_reply, l_responsePages )
-	DISPLAY "Pages:",l_responsePages.pages
+	DISPLAY "Songs Pages:",l_responsePages.pages
+
 	FOR x = 1 TO l_responsePages.pages
 		CALL cli_setlist.listSongs(x) RETURNING l_ws_stat, l_ws_reply
 		CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
-		DISPLAY "Stat:", l_ws_stat," Reply:",l_ws_reply
+--		DISPLAY "Songs Stat:", l_ws_stat," Reply:",l_ws_reply
+		IF l_ws_stat != 0 THEN 
+			CALL fgl_winMessage("WS Error",l_ws_reply,"exclamation")
+			RETURN
+		END IF
 		CALL util.JSON.parse(l_ws_reply, l_responseSongs )
-		FOR y = 1 TO l_responseSongs.arr.getLength()
+		FOR y = 1 TO l_responseSongs.len
 			LET this.len = this.len + 1
 			LET this.arr[ this.len ].* = l_responseSongs.arr[y].*
 			CALL this.set_listItem( this.len )
