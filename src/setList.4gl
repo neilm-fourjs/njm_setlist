@@ -35,17 +35,25 @@ FUNCTION (this setList) get(l_server STRING, l_songs songs) RETURNS ()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) getList(l_server STRING, l_id INTEGER, l_songs songs) RETURNS ()
+	DEFINE x SMALLINT
 	LET m_songs = l_songs
 	IF l_server IS NULL THEN
 		CALL this.getListFromDB(l_id)
 	ELSE
 		CALL this.getListFromServer(l_server, l_id)
 	END IF
+	LET this.currentListId = l_id
+	FOR x = 1 TO this.arrLen
+		IF this.arr[x].id = l_id THEN
+			LET this.currentList = this.arr[x].name
+			EXIT FOR
+		END IF
+	END FOR
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) getFromDB() RETURNS ()
 	DEFINE l_setList RECORD LIKE setlist.*
-	DECLARE sl_cur CURSOR FOR SELECT * FROM setlist WHERE stat != "D" OR stat IS NULL
+	DECLARE sl_cur CURSOR FOR SELECT * FROM setlist WHERE stat != "D" OR stat IS NULL ORDER BY name
 	FOREACH sl_cur INTO l_setlist.*
 		CALL this.arr.appendElement()
 		LET this.arrLen = this.arrLen + 1
@@ -75,18 +83,6 @@ FUNCTION (this setList) getListFromDB( l_id INTEGER ) RETURNS ()
 			CALL this.addBreak()
 		END IF
 	END FOREACH
-END FUNCTION
---------------------------------------------------------------------------------
-FUNCTION (this setList) addBreak() RETURNS ()
-		LET this.listLen = this.listLen + 1
-		CALL this.list.appendElement()
-		LET this.list[ this.listLen ].lrn = "fa-coffee"
-		LET this.list[ this.listLen ].titl = C_BREAK
-		LET this.list[ this.listLen ].songkey = NULL
-		LET this.list[ this.listLen ].tempo = NULL
-		LET this.list[ this.listLen ].tim = NULL
-		LET this.list[ this.listLen ].num = -1
-		LET this.list[ this.listLen ].id = -1
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) getFromServer(l_server STRING) RETURNS ()
@@ -168,35 +164,25 @@ END FUNCTION
 FUNCTION (this setList) addSong( l_idx INTEGER, l_song songs.t_listitem) RETURNS()
 	CALL this.list.insertElement( l_idx )
 	LET this.list[ l_idx ].* = l_song.*
+	LET this.listLen = this.listLen + 1
 	LET this.saved = FALSE
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) new() RETURNS()
-	DEFINE l_name VARCHAR(20)
-	DEFINE x SMALLINT
-	LET int_flag = FALSE
-	PROMPT "Enter Name for Set List:" FOR l_name
-	IF int_flag OR l_name IS NULL THEN RETURN END IF
-
-	FOR x = 1 TO this.arrLen
-		IF this.arr[x].name != l_name THEN
-			CALL fgl_winMessage("Error","Set List already exists!","exclamation")
-			RETURN
-		END IF
-	END FOR
+FUNCTION (this setList) new(l_name LIKE setlist.name) RETURNS ()
 
 	CALL this.list.clear()
 	LET this.listLen = 0
 	LET this.currentList = l_name
 	LET this.currentListId = 0
 	LET this.saved = FALSE
-	CALL log.logIt( "New setlist Id:"||this.currentListId||" Name:"||l_name)
+	CALL log.logIt( "New setlist:"||l_name)
 
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) del(l_server STRING) RETURNS()
 	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
+	DEFINE x SMALLINT
 	LET cli_setlist.Endpoint.Address.Uri = l_server
 
 	CALL this.list.clear()
@@ -210,6 +196,16 @@ FUNCTION (this setList) del(l_server STRING) RETURNS()
 	ELSE
 		CALL cli_setlist.delSetList(this.currentListId) RETURNING l_ws_stat, l_ws_reply
 	END IF
+
+-- delete from list of lists
+	FOR x = 1 TO this.arrLen
+		IF this.arr[x].id = this.currentListId THEN
+			CALL this.arr.deleteElement(x)
+			EXIT FOR
+		END IF
+	END FOR
+	LET this.arrLen = this.arrLen - 1
+
 	MESSAGE "Setlist Deleted."
 
 END FUNCTION
@@ -218,6 +214,10 @@ FUNCTION (this setList) save(l_server STRING)
 	DEFINE x SMALLINT	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
 	DEFINE l_post cli_setlist.addSetListRequestBodyType
+	DEFINE l_response RECORD
+		reply STRING,
+		id INTEGER
+	END RECORD
 	LET cli_setlist.Endpoint.Address.Uri = l_server
 
 	CALL log.logIt( "Saving setlist Id:"||NVL(this.currentListId,"NULL"))
@@ -237,8 +237,28 @@ FUNCTION (this setList) save(l_server STRING)
 			LET l_post.items[x] = this.list[x].id
 		END FOR
 		CALL cli_setlist.addSetList(l_post.*) RETURNING l_ws_stat, l_ws_reply
+		CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
 	END IF
-	LET this.saved = TRUE
-	MESSAGE "Setlist Saved."
+	DISPLAY "Setlist save Stat:", l_ws_stat," Reply:",l_ws_reply
+	CALL util.JSON.parse(l_ws_reply, l_response )
+	IF l_response.id != 0 THEN
+		LET this.currentListId = l_response.id
+		LET this.saved = TRUE
+		MESSAGE SFMT("Setlist %1 Saved.", l_response.id)
+	ELSE
+		CALL fgl_winMessage("Error", l_response.reply, "exclamation")
+	END IF
 
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION (this setList) addBreak() RETURNS ()
+		LET this.listLen = this.listLen + 1
+		CALL this.list.appendElement()
+		LET this.list[ this.listLen ].lrn = "fa-coffee"
+		LET this.list[ this.listLen ].titl = C_BREAK
+		LET this.list[ this.listLen ].songkey = NULL
+		LET this.list[ this.listLen ].tempo = NULL
+		LET this.list[ this.listLen ].tim = NULL
+		LET this.list[ this.listLen ].num = -1
+		LET this.list[ this.listLen ].id = -1
 END FUNCTION

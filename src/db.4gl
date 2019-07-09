@@ -173,7 +173,6 @@ FUNCTION unload()
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
 FUNCTION load()
-	DEFINE l_id INTEGER
 
 	DELETE FROM setlist
 	DELETE FROM setlist_song
@@ -181,24 +180,33 @@ FUNCTION load()
 	DELETE FROM songs
 
 	LOAD FROM "songs.unl" INSERT INTO songs
-	IF m_dbtype = "dbmpgs" THEN
-		SELECT MAX(id) INTO l_id FROM songs
-		LET l_id = l_id + 1
-		EXECUTE IMMEDIATE "SELECT setval('songs_id_seq', "||l_id||")"
-	END IF
+	CALL fix_songSerial()
 
-	LOAD FROM "setlist.unl" INSERT INTO setlist (id, name )
-	IF m_dbtype = "dbmpgs" THEN
-		SELECT MAX(id) INTO l_id FROM setlist
-		LET l_id = l_id + 1
-		EXECUTE IMMEDIATE "SELECT setval('setlist_id_seq', "||l_id||")"
-	END IF
+	LOAD FROM "setlist.unl" INSERT INTO setlist (id, NAME )
+	CALL fix_setlistSerial()
 
 	LOAD FROM "setlist_song.unl" INSERT INTO setlist_song
 	LOAD FROM "setlist_hist.unl" INSERT INTO setlist_hist
 
 	CALL fgl_winMessage("Loads","Data loaded.","information")
-
+END FUNCTION
+----------------------------------------------------------------------------------------------------
+FUNCTION fix_songSerial()
+	DEFINE l_id INTEGER
+	IF m_dbtype = "dbmpgs" THEN
+		SELECT MAX(id) INTO l_id FROM songs
+		LET l_id = l_id + 1
+		EXECUTE IMMEDIATE "SELECT setval('songs_id_seq', "||l_id||")"
+	END IF
+END FUNCTION
+----------------------------------------------------------------------------------------------------
+FUNCTION fix_setlistSerial()
+	DEFINE l_id INTEGER
+	IF m_dbtype = "dbmpgs" THEN
+		SELECT MAX(id) INTO l_id FROM setlist
+		LET l_id = l_id + 1
+		EXECUTE IMMEDIATE "SELECT setval('setlist_id_seq', "||l_id||")"
+	END IF
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
 FUNCTION backup()

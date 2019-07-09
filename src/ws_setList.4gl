@@ -104,7 +104,7 @@ PUBLIC FUNCTION listSetLists(
 		len SMALLINT
 	END RECORD
   DEFINE x, y SMALLINT
-  DECLARE slcur SCROLL CURSOR FOR SELECT * FROM setlist WHERE stat != "D" OR stat IS NULL
+  DECLARE slcur SCROLL CURSOR FOR SELECT * FROM setlist WHERE stat != "D" OR stat IS NULL ORDER BY name
   IF l_pgno IS NULL THEN LET l_pgno = 1 END IF
   OPEN slcur
   LET y = 1
@@ -155,7 +155,7 @@ PUBLIC FUNCTION addSetList( l_newSetList t_addSetList)
 	DEFINE response RECORD
 		reply STRING,
 		id INTEGER
-	END RECORD
+	END RECORD = ( reply: "addSetList", id: 0 )
 	DEFINE x SMALLINT
 	DEFINE l_stat CHAR(1) = "N"
 
@@ -163,17 +163,29 @@ PUBLIC FUNCTION addSetList( l_newSetList t_addSetList)
 		DELETE FROM setlist WHERE id = l_newSetList.id
 		DELETE FROM setlist_song WHERE setlist_id = l_newSetList.id
 		LET l_stat = "U"
-		INSERT INTO setlist (id, name, stat) VALUES( l_newSetList.id, l_newSetList.name, l_stat )
-		LET response.id = l_newSetList.id
+		TRY
+			LET response.id = l_newSetList.id
+			INSERT INTO setlist (id, name, stat) VALUES( l_newSetList.id, l_newSetList.name, l_stat )
+			CALL db.fix_setlistSerial()
+		CATCH
+			LET response.reply = "Error %1 : %2", STATUS, SQLERRMESSAGE
+		END TRY
 	ELSE
-		INSERT INTO setlist ( name, stat) VALUES( l_newSetList.name, l_stat )
-		LET response.id = SQLCA.sqlerrd[2]
+		TRY
+			INSERT INTO setlist ( name, stat) VALUES( l_newSetList.name, l_stat )
+			LET response.id = SQLCA.sqlerrd[2]
+		CATCH
+			LET response.reply = "Error %1 : %2", STATUS, SQLERRMESSAGE
+		END TRY
 	END IF
 
-	FOR x = 1 TO l_newSetList.items.getLength()
-		INSERT INTO setlist_song VALUES( response.id, l_newSetList.items[x], x)
-	END FOR
-  CALL log.logIt( SFMT("addSetList id: %1 stat: %2 items: %3", response.id, l_stat, l_newSetList.items.getLength()))
+	IF response.id != 0 THEN
+		FOR x = 1 TO l_newSetList.items.getLength()
+			INSERT INTO setlist_song VALUES( response.id, l_newSetList.items[x], x)
+		END FOR
+		CALL log.logIt( SFMT("addSetList id: %1 stat: %2 items: %3", response.id, l_stat, l_newSetList.items.getLength()))
+		LET response.reply = SFMT("setList %1 inserted songs: %2", l_newSetList.name, l_newSetList.items.getLength())
+	END IF
   RETURN g2_ws.service_reply(0,  util.JSONObject.fromFGL(response).toString())
 END FUNCTION
 ----------------------------------------------------------------------------------------------------

@@ -65,6 +65,7 @@ FUNCTION main_dialog()
 	DEFINE l_dnd ui.DragDrop
 	DEFINE l_drag_source STRING
 	DEFINE x SMALLINT
+	DEFINE l_name LIKE setlist.name
 	DEFINE l_rec songs.t_listitem
 
 	IF m_setlist_id IS NULL OR m_setlist_id = 0 THEN LET m_setlist_id = m_setlist.arrLen END IF
@@ -193,19 +194,37 @@ FUNCTION main_dialog()
 			LET m_filter_learnt = NOT m_filter_learnt
 			CALL DIALOG.getForm().setElementImage("filter2", IIF(m_filter_learnt,"reset_filter","fa-filter") )
 			CALL filter(__LINE__)
-		ON ACTION new_setlist
-			CALL m_setList.new()
-		ON ACTION save_setlist
-			CALL m_setList.save(m_server)
+
 		ON ACTION prn_setlist
 			CALL prn_setlist(TRUE,"../etc/setlist")
 		ON ACTION prn_setlist2
 			CALL prn_setlist(TRUE,"../etc/songlist")
 		ON ACTION prn_songlist
 			CALL prn_setlist(FALSE,"../etc/songlist")
+
+		ON ACTION save_setlist
+			CALL m_setList.save(m_server)
+
+		ON ACTION new_setlist
+			LET int_flag = FALSE
+			PROMPT "Enter Name for Set List:" FOR l_name
+			IF int_flag OR l_name IS NULL THEN LET int_flag = FALSE CONTINUE DIALOG END IF
+			FOR x = 1 TO m_setList.arrLen
+				IF m_setList.arr[x].name = l_name THEN
+					CALL fgl_winMessage("Error","Set List already exists!","exclamation")
+					CONTINUE DIALOG
+				END IF
+			END FOR
+			CALL m_setList.new( l_name )
+			LET m_setlist_id = 0
+			CALL cb_setList( m_cb_setlist )
+
 		ON ACTION del_setlist
 			IF fgl_winQuestion("Confirm","Delete setlist?","No","Yes|No","question",0) = "Yes" THEN
 				CALL m_setList.del(m_server)
+				CALL cb_setList( m_cb_setlist )
+				LET m_setlist_id = m_setlist.arrLen
+				CALL m_setlist.getList(m_server, m_setlist_id, m_songs )
 			ELSE
 				CALL log.logIt("Delete setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 			END IF
@@ -213,7 +232,7 @@ FUNCTION main_dialog()
 
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION cb_setlist(l_cb ui.ComboBox)
+FUNCTION cb_setList(l_cb ui.ComboBox)
 	DEFINE x SMALLINT
 	LET m_cb_setlist = l_cb
 	CALL l_cb.clear()

@@ -42,6 +42,7 @@ MAIN
 			WHEN "newload" CALL db.newload()
 			WHEN "load" CALL db.load()
 			WHEN "unload" CALL db.unload()
+			WHEN "undel" UPDATE setlist SET stat = "N"
 		END CASE
 	END IF
 
