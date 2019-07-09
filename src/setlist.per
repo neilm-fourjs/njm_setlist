@@ -83,6 +83,7 @@ END -- GRID
 END -- HBOX
 
 ATTRIBUTES
+
 LABEL master : master, TEXT="Master Song List", STYLE="darkred";
 BUTTON b1 : insert,TEXT="";
 BUTTON b2 : update,TEXT="";
@@ -90,6 +91,7 @@ BUTTON b3 : filter,TEXT="";
 BUTTON b4 : filter2,TEXT="";
 BUTTON b5 : prn_songlist,TEXT="";
 
+-- Songs
 no1 = FORMONLY.no1, TITLE="#";
 PHANTOM FORMONLY.sid;
 titl = FORMONLY.stitl,TITLE="Title", IMAGECOLUMN=lrn;
@@ -111,6 +113,7 @@ BUTTON s5 : prn_setlist,TEXT="";
 BUTTON s6 : prn_setlist2,TEXT="";
 BUTTON s7 : del_setlist,TEXT="";
 
+-- Setlist
 no2 = FORMONLY.no2, TITLE="#";
 PHANTOM FORMONLY.aid;
 atitl = FORMONLY.atitl,TITLE="Title", IMAGECOLUMN=lrn2;
@@ -121,6 +124,7 @@ IMAGE t2 = FORMONLY.t2,TITLE="Tempo",AUTOSCALE;
 k2 = FORMONLY.k2,TITLE="Key";
 AGGREGATE atot = FORMONLY.l_atot,AGGREGATETEXT="Total:",AGGREGATETYPE=PROGRAM;
 
+-- Song Details
 LABEL l001 : lab1, TEXT="Title:",JUSTIFY=RIGHT;
 LABEL l002 : lab3, TEXT="Artist:",JUSTIFY=RIGHT;
 LABEL l003 : lab3, TEXT="Duration:",JUSTIFY=RIGHT;
@@ -155,9 +159,10 @@ COMBOBOX f12 = FORMONLY.vox_fx,ITEMS=("None","Delay","Marmony"), NOT NULL;
 COMBOBOX f13 = FORMONLY.tuning,ITEMS=(("S","Standard"),("DD","Dropped D"),("OD","Open D")), NOT NULL;
 SPINEDIT f14 = FORMONLY.capo,VALUEMIN=0, VALUEMAX=12, NOT NULL;
 COMBOBOX f15 = FORMONLY.guitar_fx,ITEMS=("None","Chorus","Tremolo","Loop","Chorus-n-Loop","Tremolo-n-Loop","Echo"), NOT NULL;
+
 BUTTON accept : accept;
 BUTTON cancel : cancel;
 
 INSTRUCTIONS
-SCREEN RECORD tab1 ( FORMONLY.no1 THRU FORMONLY.k1 )
-SCREEN RECORD tab2 ( FORMONLY.no2 THRU FORMONLY.k2 )
+SCREEN RECORD tab1 ( FORMONLY.no1 THRU FORMONLY.k1 ) -- Songs
+SCREEN RECORD tab2 ( FORMONLY.no2 THRU FORMONLY.k2 ) -- Setlist

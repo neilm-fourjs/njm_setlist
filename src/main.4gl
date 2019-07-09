@@ -1,7 +1,7 @@
 
+-- New version of the setlist demo that uses Genero 3.20 module objects.
+
 -- Idea - can I use an INTERFACE to the class for DB vs WS ?
-
-
 
 IMPORT os
 IMPORT FGL log
@@ -112,11 +112,9 @@ FUNCTION main_dialog()
 			BEFORE ROW
 				CALL disp_song( m_setlist.list[ arr_curr() ].id )
 
-			ON UPDATE
-				CALL m_songs.upd( m_setlist.list[ arr_curr() ].id )
-
 			ON DELETE
 				CALL log.logIt("Delete song from list:"||arr_curr()||":"||m_setlist.list[arr_curr()].titl)
+				LET m_setlist.saved = FALSE
 				CALL calc_tots(__LINE__)
 
 			ON ACTION break_set
@@ -150,18 +148,18 @@ FUNCTION main_dialog()
 						IF DIALOG.isRowSelected("tab1",x) THEN
 							LET l_rec.* = m_filter_listed[x].*
 							DISPLAY "2.dropped songlist row:",x," ",l_rec.titl," into:",l_dnd.getLocationRow()
-							CALL m_setlist.addSong( l_dnd.getLocationRow(), l_rec.* )
+							CALL m_setlist.addSong( l_dnd.getLocationRow(), l_rec )
 						END IF
 					END FOR
 					CALL calc_tots(__LINE__)
 				END IF
-				IF l_drag_source = "song" THEN
+				IF l_drag_source = "setlist" THEN
 					FOR x = 1 TO m_setlist.listLen
 						IF DIALOG.isRowSelected("tab2",x) THEN
 							LET l_rec.* = m_setlist.list[x].*
 							CALL m_setlist.removeSong(x)
 							DISPLAY "2.dropped song row:",x," ",l_rec.titl," into:",l_dnd.getLocationRow()
-							CALL m_setlist.addSong( l_dnd.getLocationRow(), l_rec.* )
+							CALL m_setlist.addSong( l_dnd.getLocationRow(), l_rec )
 						END IF
 					END FOR
 				END IF
@@ -180,12 +178,13 @@ FUNCTION main_dialog()
 		ON ACTION exit
 			IF NOT m_setlist.saved THEN
 				IF fgl_winQuestion("Confirm","Save changes to setlist?","No","Yes|No","question",0) = "Yes" THEN
-					CALL m_setList.save()
+					CALL m_setList.save(m_server)
 				ELSE
 					CALL log.logIt("Save setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 				END IF
 			END IF
 			EXIT DIALOG
+
 		ON ACTION filter
 			LET m_filter_list = NOT m_filter_list
 			CALL DIALOG.getForm().setElementImage("filter", IIF(m_filter_list,"reset_filter","fa-filter") )
@@ -197,7 +196,7 @@ FUNCTION main_dialog()
 		ON ACTION new_setlist
 			CALL m_setList.new()
 		ON ACTION save_setlist
-			CALL m_setList.save()
+			CALL m_setList.save(m_server)
 		ON ACTION prn_setlist
 			CALL prn_setlist(TRUE,"../etc/setlist")
 		ON ACTION prn_setlist2
@@ -206,8 +205,7 @@ FUNCTION main_dialog()
 			CALL prn_setlist(FALSE,"../etc/songlist")
 		ON ACTION del_setlist
 			IF fgl_winQuestion("Confirm","Delete setlist?","No","Yes|No","question",0) = "Yes" THEN
-				CALL m_setList.del()
-
+				CALL m_setList.del(m_server)
 			ELSE
 				CALL log.logIt("Delete setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 			END IF

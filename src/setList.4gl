@@ -22,6 +22,11 @@ END RECORD
 --------------------------------------------------------------------------------
 FUNCTION (this setList) get(l_server STRING, l_songs songs) RETURNS ()
 	LET m_songs = l_songs
+	LET this.saved = TRUE
+	CALL this.arr.clear()
+	LET this.arrLen = 0
+	CALL this.list.clear()
+	LET this.listLen = 0
 	IF l_server IS NULL THEN
 		CALL this.getFromDB()
 	ELSE
@@ -40,9 +45,7 @@ END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) getFromDB() RETURNS ()
 	DEFINE l_setList RECORD LIKE setlist.*
-	CALL this.arr.clear()
-	LET this.arrLen = 0
-	DECLARE sl_cur CURSOR FOR SELECT * FROM setlist
+	DECLARE sl_cur CURSOR FOR SELECT * FROM setlist WHERE stat != "D" OR stat IS NULL
 	FOREACH sl_cur INTO l_setlist.*
 		CALL this.arr.appendElement()
 		LET this.arrLen = this.arrLen + 1
@@ -53,9 +56,9 @@ END FUNCTION
 FUNCTION (this setList) getListFromDB( l_id INTEGER ) RETURNS ()
 	DEFINE l_seq_no, l_song_id INTEGER
 	DEFINE x SMALLINT
-
 	CALL this.list.clear()
 	LET this.listLen = 0
+	LET this.saved = TRUE
 	DECLARE sl2_cur CURSOR FOR
 		SELECT song_id, seq_no FROM setlist_song WHERE setlist_id = l_id ORDER BY seq_no
 	FOREACH sl2_cur INTO l_song_id, l_seq_no
@@ -72,7 +75,6 @@ FUNCTION (this setList) getListFromDB( l_id INTEGER ) RETURNS ()
 			CALL this.addBreak()
 		END IF
 	END FOREACH
-	LET this.saved = TRUE
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) addBreak() RETURNS ()
@@ -99,8 +101,6 @@ FUNCTION (this setList) getFromServer(l_server STRING) RETURNS ()
 		len SMALLINT
 	END RECORD
 	LET cli_setlist.Endpoint.Address.Uri = l_server
-	CALL this.arr.clear()
-	LET this.arrLen = 0
 
 	DISPLAY "Getting pages for setlist list ..."
 	CALL cli_setlist.pagesSetLists() RETURNING l_ws_stat, l_ws_reply
@@ -140,6 +140,7 @@ FUNCTION (this setList) getListFromServer( l_server STRING, l_id INTEGER ) RETUR
 	LET cli_setlist.Endpoint.Address.Uri = l_server
 	CALL this.list.clear()
 	LET this.listLen = 0
+	LET this.saved = TRUE
 
 	CALL cli_setlist.getSetList(l_id) RETURNING l_ws_stat, l_ws_reply
 	CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
@@ -184,34 +185,45 @@ FUNCTION (this setList) new() RETURNS()
 		END IF
 	END FOR
 
-	INSERT INTO setlist ( name ) VALUES( l_name )
 	CALL this.list.clear()
 	LET this.listLen = 0
 	LET this.currentList = l_name
-	LET this.currentListId = SQLCA.sqlerrd[2]
+	LET this.currentListId = 0
 	LET this.saved = FALSE
 	CALL log.logIt( "New setlist Id:"||this.currentListId||" Name:"||l_name)
 
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) del() RETURNS()
+FUNCTION (this setList) del(l_server STRING) RETURNS()
 
 	CALL log.logIt( "Delete setlist Id:"||this.currentListId)
-	DELETE FROM setlist WHERE id = this.currentListId
-	DELETE FROM setlist_song WHERE setlist_id = this.currentListId
+	IF l_server IS NULL THEN
+		DELETE FROM setlist WHERE id = this.currentListId
+		DELETE FROM setlist_song WHERE setlist_id = this.currentListId
+	ELSE
+--TODO: WS call
+	END IF
 	MESSAGE "Setlist Deleted."
 	CALL this.list.clear()
 
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) save()
+FUNCTION (this setList) save(l_server STRING)
 	DEFINE x SMALLINT
 
 	CALL log.logIt( "Saving setlist Id:"||NVL(this.currentListId,"NULL"))
-	DELETE FROM setlist_song WHERE setlist_id = this.currentListId
-	FOR x = 1 TO this.listLen
-		INSERT INTO setlist_song VALUES( this.currentListId, this.list[x].id, x )
-	END FOR
+	IF l_server IS NULL THEN
+		IF this.currentListId = 0 THEN
+			INSERT INTO setlist ( name ) VALUES( this.currentList )
+			LET this.currentListId = SQLCA.sqlerrd[2]
+		END IF
+		DELETE FROM setlist_song WHERE setlist_id = this.currentListId
+		FOR x = 1 TO this.listLen
+			INSERT INTO setlist_song VALUES( this.currentListId, this.list[x].id, x )
+		END FOR
+	ELSE
+--TODO: WS call
+	END IF
 	LET this.saved = TRUE
 	MESSAGE "Setlist Saved."
 

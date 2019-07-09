@@ -36,6 +36,7 @@ MAIN
 	IF m_use_db THEN
 		CALL db.connect("songs")
 		CASE ARG_VAL(1)
+			WHEN "recreate" CALL db.backup() CALL db.drop() CALL db.load()
 			WHEN "drop" CALL db.drop()
 			WHEN "create" CALL db.create()
 			WHEN "newload" CALL db.newload()
@@ -219,7 +220,7 @@ FUNCTION cb_setlist(cb)
 	DEFINE l_name VARCHAR(20)
 	CALL cb.clear()
 	LET m_cb_setlist = cb
-	DECLARE sl_cur CURSOR FOR SELECT id,name FROM setlist
+	DECLARE sl_cur CURSOR FOR SELECT id,name FROM setlist WHERE stat != "D" OR stat IS NULL
 	FOREACH sl_cur INTO l_id, l_name
 		IF l_name IS NOT NULL THEN
 			DISPLAY "cb_setlist:",l_id," :",l_name

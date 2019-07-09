@@ -1,5 +1,6 @@
-setlist^id^2^4^1^
+setlist^id^6^4^1^
 setlist^name^201^20^2^
+setlist^stat^0^1^3^
 setlist_hist^setlist_id^2^4^1^
 setlist_hist^location^201^80^2^
 setlist_hist^performance^7^4^3^

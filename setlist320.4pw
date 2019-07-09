@@ -104,11 +104,11 @@
       <File filePath="etc/setlist.4rp"/>
       <File filePath="etc/songlist.4rp"/>
     </Library>
-    <Application binaryName="setlist" dependencies="1986,-620758080,1268305552" id="18736" label="setlist">
+    <Application binaryName="setlist300" dependencies="1986,-620758080,1268305552" id="18736" label="setlist300">
       <File filePath="src/setlist.per"/>
       <File compilerOptions="--build-rdd" filePath="src/setlist300.4gl"/>
     </Application>
-    <Application binaryName="setlist2" dependencies="-620758080,1986,1268305552" environment="value:WSSERVER=https://generodemos.dynu.net/f/ws/r/ws_setlist/ws_setList/" id="1851630676" label="setlist2">
+    <Application binaryName="setlist320" dependencies="-620758080,1986,1268305552" environment="value:WSSERVER=https://generodemos.dynu.net/f/ws/r/ws_setlist/ws_setList/" id="1851630676" label="setlist320">
       <File filePath="src/main.4gl"/>
       <File filePath="src/setList.4gl"/>
       <File filePath="src/songs.4gl"/>

@@ -80,7 +80,7 @@ PUBLIC FUNCTION pagesSetLists()
 	DEFINE response RECORD
 		pages SMALLINT
 	END RECORD
-	SELECT COUNT(*) INTO x FROM setlist
+	SELECT COUNT(*) INTO x FROM setlist WHERE stat != "D" OR stat IS NULL
 	LET response.pages = x / c_itemsPerPage
 	IF response.pages MOD c_itemsPerPage THEN LET response.pages = response.pages + 1 END IF
 	IF response.pages = 0 AND x > 0 THEN LET response.pages = 1 END IF
@@ -98,10 +98,8 @@ PUBLIC FUNCTION listSetLists(
 		len SMALLINT
 	END RECORD
   DEFINE x, y SMALLINT
-  DECLARE slcur SCROLL CURSOR FOR SELECT * FROM setlist
-  IF l_pgno IS NULL THEN
-    LET l_pgno = 1
-  END IF
+  DECLARE slcur SCROLL CURSOR FOR SELECT * FROM setlist WHERE stat != "D" OR stat IS NULL
+  IF l_pgno IS NULL THEN LET l_pgno = 1 END IF
   OPEN slcur
   LET y = 1
   LET x = ((l_pgno - 1) * c_itemsPerPage) + 1
@@ -116,6 +114,7 @@ PUBLIC FUNCTION listSetLists(
     END IF
   END WHILE
   CLOSE slcur
+	IF response.arr[y].name IS NULL THEN CALL response.arr.deleteElement(y) END IF
 	LET response.len = response.arr.getLength()
   CALL log.logIt( SFMT("listSetLists: %1", response.arr.getLength()))
   RETURN g2_ws.service_reply(0, util.JSONObject.fromFGL(response).toString())
@@ -141,6 +140,28 @@ PUBLIC FUNCTION getSetList(
 	ELSE
   	RETURN g2_ws.service_reply(100, util.JSONObject.fromFGL(response).toString() )
 	END IF
+END FUNCTION
+----------------------------------------------------------------------------------------------------
+-- get list of setLists songs
+PUBLIC FUNCTION delSetList(
+    l_id SMALLINT ATTRIBUTES(WSParam))
+    ATTRIBUTES(WSGet, WSPath = "/delSetList/{l_id}", WSDescription = "Delete SetList List")
+    RETURNS STRING
+	DEFINE response RECORD
+		reply STRING
+	END RECORD
+{
+	DELETE FROM setlist WHERE id = l_id
+	DELETE FROM setlist_song WHERE setlist_id = l_id
+}
+	UPDATE setlist SET stat = "D" WHERE id = l_id
+	IF STATUS = 0 THEN
+		LET response.reply = SFMT("Setlist %1 deleted.", l_id)
+	ELSE
+		LET response.reply = SFMT("Setlist %1 delete failed: %2 %3.", l_id, STATUS,SQLERRMESSAGE)
+	END IF
+  CALL log.logIt( SFMT("delSetList: %1 - Reply: %2", l_id, response.reply ))
+  RETURN g2_ws.service_reply(0,  util.JSONObject.fromFGL(response).toString())
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
 -- Just exit the service

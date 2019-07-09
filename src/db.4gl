@@ -97,7 +97,8 @@ FUNCTION create()
 
 		CREATE TABLE setlist (
 			id SERIAL,
-			name VARCHAR(20)
+			name VARCHAR(20),
+			stat CHAR(1)
 		)
 		CREATE UNIQUE INDEX i_setlist ON setlist(id);
 
@@ -118,7 +119,7 @@ FUNCTION create()
 		EXIT PROGRAM
 	END TRY
 
-	CALL load()
+--	CALL load()
 
 END FUNCTION
 --------------------------------------------------------------------------------
@@ -173,22 +174,29 @@ END FUNCTION
 ----------------------------------------------------------------------------------------------------
 FUNCTION load()
 	DEFINE l_id INTEGER
+
 	DELETE FROM setlist
 	DELETE FROM setlist_song
 	DELETE FROM setlist_hist
 	DELETE FROM songs
-	LOAD FROM "songs.unl" INSERT INTO songs
-	SELECT MAX(id) INTO l_id FROM songs
-	LET l_id = l_id + 1
-	EXECUTE IMMEDIATE "SELECT setval('songs_id_seq', "||l_id||")"
 
-	LOAD FROM "setlist.unl" INSERT INTO setlist
-	SELECT MAX(id) INTO l_id FROM setlist
-	LET l_id = l_id + 1
-	EXECUTE IMMEDIATE "SELECT setval('setlist_id_seq', "||l_id||")"
+	LOAD FROM "songs.unl" INSERT INTO songs
+	IF m_dbtype = "dbmpgs" THEN
+		SELECT MAX(id) INTO l_id FROM songs
+		LET l_id = l_id + 1
+		EXECUTE IMMEDIATE "SELECT setval('songs_id_seq', "||l_id||")"
+	END IF
+
+	LOAD FROM "setlist.unl" INSERT INTO setlist (id, name )
+	IF m_dbtype = "dbmpgs" THEN
+		SELECT MAX(id) INTO l_id FROM setlist
+		LET l_id = l_id + 1
+		EXECUTE IMMEDIATE "SELECT setval('setlist_id_seq', "||l_id||")"
+	END IF
 
 	LOAD FROM "setlist_song.unl" INSERT INTO setlist_song
 	LOAD FROM "setlist_hist.unl" INSERT INTO setlist_hist
+
 	CALL fgl_winMessage("Loads","Data loaded.","information")
 
 END FUNCTION
