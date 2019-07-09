@@ -14,7 +14,7 @@ IMPORT FGL setList
 SCHEMA songs
 
 DEFINE m_filter_listed DYNAMIC ARRAY OF songs.t_listitem
-DEFINE m_saved, m_filter_list, m_filter_learnt BOOLEAN
+DEFINE m_filter_list, m_filter_learnt BOOLEAN
 DEFINE m_use_db BOOLEAN = FALSE
 DEFINE m_setlist_id INTEGER
 DEFINE m_songs songs
@@ -48,6 +48,11 @@ MAIN
 
 	OPEN FORM f FROM "setlist"
 	DISPLAY FORM f
+	IF NOT m_use_db THEN
+		CALL appendTitle(SFMT("SRV:%1",m_server))
+	ELSE
+		CALL appendTitle(SFMT("DB:%1",db.m_db))
+	END IF
 
 	CALL main_dialog()
 
@@ -79,7 +84,7 @@ FUNCTION main_dialog()
 			ON DRAG_START(l_dnd) LET l_drag_source = "songlist"
 				DISPLAY "1.drag start:",l_drag_source
 			ON DRAG_ENTER(l_dnd)
-				IF l_drag_source = "song" THEN
+				IF l_drag_source = "setlist" THEN
 					DISPLAY"1.drag enter okay:",l_drag_source
 					CALL l_dnd.setOperation("insert")
 					CALL l_dnd.setFeedback("all")
@@ -95,7 +100,6 @@ FUNCTION main_dialog()
 			ON ACTION addtosetlist
 				LET m_setList.listLen = m_setList.listLen + 1
 				LET m_setlist.list[ m_setlist.listLen ].* = m_filter_listed[ arr_curr() ].*
-				LET m_saved = FALSE
 				CALL calc_tots(__LINE__)
 		END DISPLAY
 
@@ -113,13 +117,12 @@ FUNCTION main_dialog()
 
 			ON DELETE
 				CALL log.logIt("Delete song from list:"||arr_curr()||":"||m_setlist.list[arr_curr()].titl)
-				LET m_saved = FALSE
 				CALL calc_tots(__LINE__)
 
 			ON ACTION break_set
 				CALL m_setList.addBreak()
-{
-			ON DRAG_START(l_dnd) LET l_drag_source = "song"
+
+			ON DRAG_START(l_dnd) LET l_drag_source = "setlist"
 				DISPLAY "2.drag start:",l_drag_source
 
 			ON DRAG_ENTER(l_dnd)
@@ -128,7 +131,7 @@ FUNCTION main_dialog()
 						DISPLAY"2.drag enter okay:",l_drag_source
 						CALL l_dnd.setOperation("copy")
 						CALL l_dnd.setFeedback("insert")
-					WHEN "song"
+					WHEN "setlist"
 						DISPLAY"2.drag enter okay:",l_drag_source
 						CALL l_dnd.setOperation("move")
 						CALL l_dnd.setFeedback("insert")
@@ -147,22 +150,18 @@ FUNCTION main_dialog()
 						IF DIALOG.isRowSelected("tab1",x) THEN
 							LET l_rec.* = m_filter_listed[x].*
 							DISPLAY "2.dropped songlist row:",x," ",l_rec.titl," into:",l_dnd.getLocationRow()
-							CALL m_setlist.insertElement( l_dnd.getLocationRow() )
-							LET m_setlist[ l_dnd.getLocationRow() ].* = l_rec.*
-							LET m_saved = FALSE
+							CALL m_setlist.addSong( l_dnd.getLocationRow(), l_rec.* )
 						END IF
 					END FOR
 					CALL calc_tots(__LINE__)
 				END IF
 				IF l_drag_source = "song" THEN
-					FOR x = 1 TO m_setlist.getLength()
+					FOR x = 1 TO m_setlist.listLen
 						IF DIALOG.isRowSelected("tab2",x) THEN
-							LET l_rec.* = m_setlist[x].*
-							CALL m_setlist.deleteElement(x)
+							LET l_rec.* = m_setlist.list[x].*
+							CALL m_setlist.removeSong(x)
 							DISPLAY "2.dropped song row:",x," ",l_rec.titl," into:",l_dnd.getLocationRow()
-							CALL m_setlist.insertElement( l_dnd.getLocationRow() )
-							LET m_setlist[ l_dnd.getLocationRow() ].* = l_rec.*
-							LET m_saved = FALSE
+							CALL m_setlist.addSong( l_dnd.getLocationRow(), l_rec.* )
 						END IF
 					END FOR
 				END IF
@@ -170,7 +169,7 @@ FUNCTION main_dialog()
       ON DRAG_FINISHED(l_dnd) 
 				DISPLAY "2.drag finished"
 				INITIALIZE l_drag_source TO NULL
-}
+
 		END DISPLAY
 		BEFORE DIALOG
       CALL DIALOG.setSelectionMode("tab1",TRUE)
@@ -179,7 +178,7 @@ FUNCTION main_dialog()
 
 		ON ACTION close EXIT DIALOG
 		ON ACTION exit
-			IF NOT m_saved THEN
+			IF NOT m_setlist.saved THEN
 				IF fgl_winQuestion("Confirm","Save changes to setlist?","No","Yes|No","question",0) = "Yes" THEN
 					CALL m_setList.save()
 				ELSE
@@ -289,6 +288,12 @@ FUNCTION calc_tots(l_line SMALLINT)
 		END IF
 	END FOR
 	DISPLAY sec_to_time( l_tot, TRUE )||"("||l_cnt||")" TO l_atot
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION appendTitle( l_new STRING )
+	DEFINE l_titl STRING
+	LET l_titl = ui.Window.getCurrent().getText()
+	CALL ui.Window.getCurrent().setText( l_titl||" "||l_new )
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)

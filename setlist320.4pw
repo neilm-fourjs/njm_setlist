@@ -76,6 +76,7 @@
     </Library>
     <Library binaryName="gas" id="452154458" label="gas">
       <File filePath="gas_deploy/setlist.xcf"/>
+      <File filePath="gas_deploy/setlistdb.xcf"/>
       <File filePath="gas_deploy/ws_setlist.xcf"/>
     </Library>
     <Library binaryName="lib" id="-620758080" label="lib">

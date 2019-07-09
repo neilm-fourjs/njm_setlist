@@ -1,9 +1,9 @@
 IMPORT os
 IMPORT FGL log
 
-DEFINE m_db VARCHAR(60)
-DEFINE m_dbname VARCHAR(20)
-DEFINE m_dbtype STRING
+PUBLIC DEFINE m_db VARCHAR(60)
+PUBLIC DEFINE m_dbname VARCHAR(20)
+PUBLIC DEFINE m_dbtype STRING
 
 --------------------------------------------------------------------------------
 FUNCTION connect(l_db)

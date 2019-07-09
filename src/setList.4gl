@@ -7,16 +7,6 @@ IMPORT FGL g2_ws
 SCHEMA songs
 
 PUBLIC CONSTANT C_BREAK = "    *** BREAK *** "
-PUBLIC TYPE t_listitem RECORD
-		num SMALLINT,
-		id INTEGER,
-		titl VARCHAR(40),
-		lrn VARCHAR(40),
-		dur SMALLINT,
-		tim CHAR(5),
-		tempo STRING,
-		songkey STRING
-	END RECORD
 
 DEFINE m_songs songs
 
@@ -148,6 +138,8 @@ FUNCTION (this setList) getListFromServer( l_server STRING, l_id INTEGER ) RETUR
 		len SMALLINT
 	END RECORD
 	LET cli_setlist.Endpoint.Address.Uri = l_server
+	CALL this.list.clear()
+	LET this.listLen = 0
 
 	CALL cli_setlist.getSetList(l_id) RETURNING l_ws_stat, l_ws_reply
 	CALL g2_ws.service_reply_unpack( l_ws_stat, l_ws_reply ) RETURNING l_ws_stat, l_ws_reply
@@ -165,6 +157,17 @@ FUNCTION (this setList) getListFromServer( l_server STRING, l_id INTEGER ) RETUR
 				END IF
 			END FOR
 	END FOR
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION (this setList) removeSong( l_idx INTEGER) RETURNS()
+	CALL this.list.deleteElement( l_idx )
+	LET this.saved = FALSE
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION (this setList) addSong( l_idx INTEGER, l_song songs.t_listitem) RETURNS()
+	CALL this.list.insertElement( l_idx )
+	LET this.list[ l_idx ].* = l_song.*
+	LET this.saved = FALSE
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) new() RETURNS()

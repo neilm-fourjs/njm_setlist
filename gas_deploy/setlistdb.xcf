@@ -8,9 +8,8 @@
 		<ENVIRONMENT_VARIABLE Id="FGLIMAGEPATH">../pics:../pics/image2font.txt</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="DBDATE">DMY4/</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="LOGDIR">../../logs</ENVIRONMENT_VARIABLE>
-		<ENVIRONMENT_VARIABLE Id="WSSERVER">https://generodemos.dynu.net/f/ws/r/ws_setlist/ws_setList/</ENVIRONMENT_VARIABLE>
 		<PATH>$(res.app.path)/bin</PATH>
-		<MODULE>setlist2.42r</MODULE>
+		<MODULE>setlist.42r</MODULE>
 	</EXECUTION>
 	<UA_OUTPUT>
 		<PROXY>$(res.uaproxy.cmd)</PROXY>
