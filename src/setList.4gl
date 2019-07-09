@@ -11,6 +11,7 @@ PUBLIC CONSTANT C_BREAK = "    *** BREAK *** "
 DEFINE m_songs songs
 
 PUBLIC TYPE setList RECORD
+	server STRING,
 	arr DYNAMIC ARRAY OF RECORD LIKE setlist.*,
 	arrLen SMALLINT,
 	currentList STRING,
@@ -21,6 +22,7 @@ PUBLIC TYPE setList RECORD
 END RECORD
 --------------------------------------------------------------------------------
 FUNCTION (this setList) get(l_server STRING, l_songs songs) RETURNS ()
+	LET this.server = l_server
 	LET m_songs = l_songs
 	LET this.saved = TRUE
 	CALL this.arr.clear()
@@ -30,17 +32,17 @@ FUNCTION (this setList) get(l_server STRING, l_songs songs) RETURNS ()
 	IF l_server IS NULL THEN
 		CALL this.getFromDB()
 	ELSE
-		CALL this.getFromServer(l_server)
+		CALL this.getFromWS()
 	END IF
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) getList(l_server STRING, l_id INTEGER, l_songs songs) RETURNS ()
+FUNCTION (this setList) getList(l_id INTEGER, l_songs songs) RETURNS ()
 	DEFINE x SMALLINT
 	LET m_songs = l_songs
-	IF l_server IS NULL THEN
+	IF this.server IS NULL THEN
 		CALL this.getListFromDB(l_id)
 	ELSE
-		CALL this.getListFromServer(l_server, l_id)
+		CALL this.getListFromWS(l_id)
 	END IF
 	LET this.currentListId = l_id
 	FOR x = 1 TO this.arrLen
@@ -61,7 +63,7 @@ FUNCTION (this setList) getFromDB() RETURNS ()
 	END FOREACH
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) getListFromDB( l_id INTEGER ) RETURNS ()
+FUNCTION (this setList) getListFromDB(l_id INTEGER) RETURNS ()
 	DEFINE l_seq_no, l_song_id INTEGER
 	DEFINE x SMALLINT
 	CALL this.list.clear()
@@ -85,7 +87,7 @@ FUNCTION (this setList) getListFromDB( l_id INTEGER ) RETURNS ()
 	END FOREACH
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) getFromServer(l_server STRING) RETURNS ()
+FUNCTION (this setList) getFromWS() RETURNS ()
 	DEFINE x, y SMALLINT
 	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
@@ -96,7 +98,7 @@ FUNCTION (this setList) getFromServer(l_server STRING) RETURNS ()
 	  arr DYNAMIC ARRAY OF RECORD LIKE setlist.*,
 		len SMALLINT
 	END RECORD
-	LET cli_setlist.Endpoint.Address.Uri = l_server
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 
 	DISPLAY "Getting pages for setlist list ..."
 	CALL cli_setlist.pagesSetLists() RETURNING l_ws_stat, l_ws_reply
@@ -125,7 +127,7 @@ FUNCTION (this setList) getFromServer(l_server STRING) RETURNS ()
 	END FOR
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) getListFromServer( l_server STRING, l_id INTEGER ) RETURNS ()
+FUNCTION (this setList) getListFromWS(l_id INTEGER ) RETURNS ()
 	DEFINE x, y SMALLINT
 	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
@@ -133,7 +135,7 @@ FUNCTION (this setList) getListFromServer( l_server STRING, l_id INTEGER ) RETUR
 	  arr DYNAMIC ARRAY OF RECORD LIKE setlist_song.*,
 		len SMALLINT
 	END RECORD
-	LET cli_setlist.Endpoint.Address.Uri = l_server
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 	CALL this.list.clear()
 	LET this.listLen = 0
 	LET this.saved = TRUE
@@ -162,9 +164,14 @@ FUNCTION (this setList) removeSong( l_idx INTEGER) RETURNS()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) addSong( l_idx INTEGER, l_song songs.t_listitem) RETURNS()
-	CALL this.list.insertElement( l_idx )
-	LET this.list[ l_idx ].* = l_song.*
 	LET this.listLen = this.listLen + 1
+	IF l_idx = 0 THEN
+		CALL this.list.appendElement()
+		LET this.list[ this.listLen ].* = l_song.*
+	ELSE
+		CALL this.list.insertElement( l_idx )
+		LET this.list[ l_idx ].* = l_song.*
+	END IF
 	LET this.saved = FALSE
 END FUNCTION
 --------------------------------------------------------------------------------
@@ -179,18 +186,18 @@ FUNCTION (this setList) new(l_name LIKE setlist.name) RETURNS ()
 
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) del(l_server STRING) RETURNS()
+FUNCTION (this setList) del() RETURNS()
 	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
 	DEFINE x SMALLINT
-	LET cli_setlist.Endpoint.Address.Uri = l_server
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 
 	CALL this.list.clear()
 	LET this.listLen = 0
 	LET this.saved = TRUE
 
 	CALL log.logIt( "Delete setlist Id:"||this.currentListId)
-	IF l_server IS NULL THEN
+	IF this.server IS NULL THEN
 		DELETE FROM setlist WHERE id = this.currentListId
 		DELETE FROM setlist_song WHERE setlist_id = this.currentListId
 	ELSE
@@ -210,7 +217,7 @@ FUNCTION (this setList) del(l_server STRING) RETURNS()
 
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this setList) save(l_server STRING)
+FUNCTION (this setList) save()
 	DEFINE x SMALLINT	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
 	DEFINE l_post cli_setlist.addSetListRequestBodyType
@@ -218,10 +225,10 @@ FUNCTION (this setList) save(l_server STRING)
 		reply STRING,
 		id INTEGER
 	END RECORD
-	LET cli_setlist.Endpoint.Address.Uri = l_server
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 
 	CALL log.logIt( "Saving setlist Id:"||NVL(this.currentListId,"NULL"))
-	IF l_server IS NULL THEN
+	IF this.server IS NULL THEN
 		IF this.currentListId = 0 THEN
 			INSERT INTO setlist ( name ) VALUES( this.currentList )
 			LET this.currentListId = SQLCA.sqlerrd[2]
@@ -261,4 +268,25 @@ FUNCTION (this setList) addBreak() RETURNS ()
 		LET this.list[ this.listLen ].tim = NULL
 		LET this.list[ this.listLen ].num = -1
 		LET this.list[ this.listLen ].id = -1
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION (this setList) totals() RETURNS (INT, INT)
+	DEFINE l_tot, l_tot2, x, l_cnt, l_cnt2 SMALLINT
+	LET l_tot = 0
+	LET l_tot2 = 0
+	LET l_cnt = 0
+	LET l_cnt2 = 0
+	FOR x = 1 TO this.listLen
+		IF this.list[x].id > 0 THEN
+			LET l_cnt = l_cnt + 1
+			LET l_cnt2 = l_cnt2 + 1
+			LET l_tot = l_tot + this.list[x].dur
+			LET l_tot2 = l_tot2 + this.list[x].dur
+		ELSE
+			LET this.list[x].titl = C_BREAK||"   Dur: ",sec_to_time( l_tot2, TRUE )||" ("||l_cnt2||")"
+			LET l_cnt2 = 0
+			LET l_tot2 = 0
+		END IF
+	END FOR
+	RETURN l_tot, l_cnt
 END FUNCTION

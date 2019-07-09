@@ -20,12 +20,13 @@ DEFINE m_setlist_id INTEGER
 DEFINE m_songs songs
 DEFINE m_setList setList
 DEFINE m_cb_setlist ui.ComboBox
-DEFINE m_server STRING
+
 MAIN
+	DEFINE l_server STRING
 
 	LET m_filter_list = FALSE
-	LET m_server = fgl_getEnv("WSSERVER")
-	IF m_server IS NULL OR m_server.getLength() < 2 THEN
+	LET l_server = fgl_getEnv("WSSERVER")
+	IF l_server IS NULL OR l_server.getLength() < 2 THEN
 		LET m_use_db = TRUE
 	END IF
 
@@ -35,21 +36,23 @@ MAIN
 	IF m_use_db THEN
 		CALL db.connect("songs")
 		CASE ARG_VAL(1)
+			WHEN "recreate" CALL db.backup() CALL db.drop() CALL db.load()
 			WHEN "drop" CALL db.drop()
 			WHEN "create" CALL db.create()
 			WHEN "newload" CALL db.newload()
 			WHEN "load" CALL db.load()
 			WHEN "unload" CALL db.unload()
+			WHEN "undel" UPDATE setlist SET stat = "N"
 		END CASE
 	END IF
 
-	CALL m_songs.get(m_server)
-	CALL m_setList.get(m_server, m_songs)
+	CALL m_songs.get(l_server)
+	CALL m_setList.get(l_server, m_songs)
 
 	OPEN FORM f FROM "setlist"
 	DISPLAY FORM f
 	IF NOT m_use_db THEN
-		CALL appendTitle(SFMT("SRV:%1",m_server))
+		CALL appendTitle(SFMT("SRV:%1",l_server))
 	ELSE
 		CALL appendTitle(SFMT("DB:%1",db.m_db))
 	END IF
@@ -69,7 +72,7 @@ FUNCTION main_dialog()
 	DEFINE l_rec songs.t_listitem
 
 	IF m_setlist_id IS NULL OR m_setlist_id = 0 THEN LET m_setlist_id = m_setlist.arrLen END IF
-	CALL m_setlist.getList(m_server, m_setlist_id, m_songs )
+	CALL m_setlist.getList(m_setlist_id, m_songs )
 	CALL filter(__LINE__)
 	CALL log.logIt( "Displaying setlist Id:"||NVL(m_setlist_id,"NULL"))
 	DIALOG ATTRIBUTES( UNBUFFERED )
@@ -99,14 +102,13 @@ FUNCTION main_dialog()
 				DISPLAY "1.drag finished"
 				INITIALIZE l_drag_source TO NULL
 			ON ACTION addtosetlist
-				LET m_setList.listLen = m_setList.listLen + 1
-				LET m_setlist.list[ m_setlist.listLen ].* = m_filter_listed[ arr_curr() ].*
+				CALL m_setList.addSong( 0, m_filter_listed[ arr_curr() ] )
 				CALL calc_tots(__LINE__)
 		END DISPLAY
 
 		INPUT BY NAME m_setlist_id ATTRIBUTES(WITHOUT DEFAULTS)
 			ON CHANGE m_setlist_id
-				CALL m_setlist.getList(m_server, m_setlist_id, m_songs )
+				CALL m_setlist.getList(m_setlist_id, m_songs )
 		END INPUT
 
 		DISPLAY ARRAY m_setlist.list TO tab2.*
@@ -179,7 +181,7 @@ FUNCTION main_dialog()
 		ON ACTION exit
 			IF NOT m_setlist.saved THEN
 				IF fgl_winQuestion("Confirm","Save changes to setlist?","No","Yes|No","question",0) = "Yes" THEN
-					CALL m_setList.save(m_server)
+					CALL m_setList.save()
 				ELSE
 					CALL log.logIt("Save setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 				END IF
@@ -203,7 +205,7 @@ FUNCTION main_dialog()
 			CALL prn_setlist(FALSE,"../etc/songlist")
 
 		ON ACTION save_setlist
-			CALL m_setList.save(m_server)
+			CALL m_setList.save()
 
 		ON ACTION new_setlist
 			LET int_flag = FALSE
@@ -221,10 +223,10 @@ FUNCTION main_dialog()
 
 		ON ACTION del_setlist
 			IF fgl_winQuestion("Confirm","Delete setlist?","No","Yes|No","question",0) = "Yes" THEN
-				CALL m_setList.del(m_server)
+				CALL m_setList.del()
 				CALL cb_setList( m_cb_setlist )
 				LET m_setlist_id = m_setlist.arrLen
-				CALL m_setlist.getList(m_server, m_setlist_id, m_songs )
+				CALL m_setlist.getList( m_setlist_id, m_songs )
 			ELSE
 				CALL log.logIt("Delete setlist Id:"||NVL(m_setlist_id,"NULL")||" Cancelled.")
 			END IF
@@ -245,13 +247,11 @@ FUNCTION disp_song( l_id )
 	DEFINE l_id INTEGER
 	DEFINE l_min, l_sec SMALLINT
 	DEFINE l_song RECORD LIKE songs.*
-
 	CALL m_songs.getSong(l_id, l_song ) -- sets l_song
 	DISPLAY BY NAME l_song.*
 	LET l_min = l_song.dur / 60
 	LET l_sec = l_song.dur - (l_min*60)
 	DISPLAY BY NAME l_min, l_sec
-
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION filter(l_line SMALLINT)
@@ -281,29 +281,16 @@ FUNCTION filter(l_line SMALLINT)
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION calc_tots(l_line SMALLINT)
-	DEFINE l_tot, l_tot2, x, l_cnt, l_cnt2 SMALLINT
+	DEFINE l_tot, x, l_cnt SMALLINT
 	DISPLAY SFMT("Calc tots: from %1, MainList: %2 SetList: %3",l_line,m_filter_listed.getLength(),m_setlist.listLen)
 	LET l_tot = 0
-	LET l_tot2 = 0
 	LET l_cnt = 0
-	LET l_cnt2 = 0
 	FOR x = 1 TO m_filter_listed.getLength()
 		LET l_tot = l_tot + m_filter_listed[x].dur
 	END FOR
 	DISPLAY sec_to_time( l_tot, TRUE )||"("||m_filter_listed.getLength()||")" TO l_stot
-	LET l_tot = 0
-	FOR x = 1 TO m_setlist.listLen
-		IF m_setlist.list[x].id > 0 THEN
-			LET l_cnt = l_cnt + 1
-			LET l_cnt2 = l_cnt2 + 1
-			LET l_tot = l_tot + m_setlist.list[x].dur
-			LET l_tot2 = l_tot2 + m_setlist.list[x].dur
-		ELSE
-			LET m_setlist.list[x].titl = C_BREAK||"   Dur: ",sec_to_time( l_tot2, TRUE )||" ("||l_cnt2||")"
-			LET l_cnt2 = 0
-			LET l_tot2 = 0
-		END IF
-	END FOR
+
+	CALL m_setlist.totals() RETURNING l_tot, l_cnt
 	DISPLAY sec_to_time( l_tot, TRUE )||"("||l_cnt||")" TO l_atot
 END FUNCTION
 --------------------------------------------------------------------------------
@@ -355,19 +342,14 @@ FUNCTION prn_setlist(l_setList BOOLEAN, l_filename STRING)
 
 	CALL log.logIt(" Finish Report ..." )
 	FINISH REPORT report_name
-
 --&endif
 END FUNCTION
 --------------------------------------------------------------------------------
 REPORT report_name(l_pg SMALLINT, x SMALLINT, l_titl STRING, l_song RECORD LIKE songs.*, l_dur STRING )
-
 	ORDER EXTERNAL BY  l_pg
-
 	FORMAT
 		FIRST PAGE HEADER
 			PRINT l_titl
-
 		ON EVERY ROW
 			PRINT l_pg, x,l_song.*, l_dur
-  
 END REPORT --report_name()

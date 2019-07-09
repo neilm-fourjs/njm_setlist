@@ -18,16 +18,18 @@ PUBLIC TYPE t_listitem RECORD
 	END RECORD
 
 PUBLIC TYPE songs RECORD
+  server STRING,
 	arr DYNAMIC ARRAY OF RECORD LIKE songs.*,
 	list DYNAMIC ARRAY OF t_listitem,
 	len SMALLINT
 END RECORD
 --------------------------------------------------------------------------------
 FUNCTION (this songs) get(l_server STRING) RETURNS ()
+	LET this.server = l_server
 	IF l_server IS NULL THEN
 		CALL this.getFromDB()
 	ELSE
-		CALL this.getFromServer( l_server )
+		CALL this.getFromWS()
 	END IF
 END FUNCTION
 --------------------------------------------------------------------------------
@@ -45,7 +47,7 @@ FUNCTION (this songs) getFromDB() RETURNS ()
 	END FOREACH
 END FUNCTION
 --------------------------------------------------------------------------------
-FUNCTION (this songs) getFromServer(l_server STRING) RETURNS ()
+FUNCTION (this songs) getFromWS() RETURNS ()
 	DEFINE x, y SMALLINT
 	DEFINE l_ws_stat SMALLINT
 	DEFINE l_ws_reply STRING
@@ -56,7 +58,7 @@ FUNCTION (this songs) getFromServer(l_server STRING) RETURNS ()
 	  arr DYNAMIC ARRAY OF RECORD LIKE songs.*,
 		len SMALLINT
 	END RECORD
-	LET cli_setlist.Endpoint.Address.Uri = l_server
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 
 	CALL this.arr.clear()
 	CALL this.list.clear()
@@ -128,10 +130,23 @@ FUNCTION (this songs) set_listItem(x SMALLINT) RETURNS ()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this songs) new(l_id INTEGER) RETURNS ()
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this songs) upd(l_id INTEGER) RETURNS ()
+	LET cli_setlist.Endpoint.Address.Uri = this.server
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this songs) del(l_id INTEGER) RETURNS ()
+	LET cli_setlist.Endpoint.Address.Uri = this.server
+END FUNCTION
+--------------------------------------------------------------------------------
+FUNCTION (this songs) totals() RETURNS (INT, INT)
+	DEFINE l_tot, x, l_cnt SMALLINT
+	LET l_tot = 0
+	LET l_cnt = 0
+	FOR x = 1 TO this.len
+		LET l_tot = l_tot + this.arr[x].dur
+	END FOR
+	RETURN l_tot, l_cnt
 END FUNCTION
