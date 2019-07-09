@@ -6,6 +6,12 @@ IMPORT FGL g2_ws
 
 SCHEMA songs
 
+TYPE t_addSetList RECORD
+	id INTEGER,
+	name LIKE setlist.name,
+	items DYNAMIC ARRAY OF INTEGER
+END RECORD
+
 CONSTANT c_itemsPerPage = 50
 
 ----------------------------------------------------------------------------------------------------
@@ -120,7 +126,7 @@ PUBLIC FUNCTION listSetLists(
   RETURN g2_ws.service_reply(0, util.JSONObject.fromFGL(response).toString())
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
--- get list of setLists songs
+-- get a setLists
 PUBLIC FUNCTION getSetList(
     l_id SMALLINT ATTRIBUTES(WSParam))
     ATTRIBUTES(WSGet, WSPath = "/getSetList/{l_id}", WSDescription = "Get SetList List")
@@ -142,10 +148,39 @@ PUBLIC FUNCTION getSetList(
 	END IF
 END FUNCTION
 ----------------------------------------------------------------------------------------------------
--- get list of setLists songs
+-- add a setList
+PUBLIC FUNCTION addSetList( l_newSetList t_addSetList)
+    ATTRIBUTES(WSPost, WSPath = "/addSetList", WSDescription = "Add SetList")
+    RETURNS STRING
+	DEFINE response RECORD
+		reply STRING,
+		id INTEGER
+	END RECORD
+	DEFINE x SMALLINT
+	DEFINE l_stat CHAR(1) = "N"
+
+	IF l_newSetList.id != 0 THEN
+		DELETE FROM setlist WHERE id = l_newSetList.id
+		DELETE FROM setlist_song WHERE setlist_id = l_newSetList.id
+		LET l_stat = "U"
+		INSERT INTO setlist (id, name, stat) VALUES( l_newSetList.id, l_newSetList.name, l_stat )
+		LET response.id = l_newSetList.id
+	ELSE
+		INSERT INTO setlist ( name, stat) VALUES( l_newSetList.name, l_stat )
+		LET response.id = SQLCA.sqlerrd[2]
+	END IF
+
+	FOR x = 1 TO l_newSetList.items.getLength()
+		INSERT INTO setlist_song VALUES( response.id, l_newSetList.items[x], x)
+	END FOR
+  CALL log.logIt( SFMT("addSetList id: %1 stat: %2 items: %3", response.id, l_stat, l_newSetList.items.getLength()))
+  RETURN g2_ws.service_reply(0,  util.JSONObject.fromFGL(response).toString())
+END FUNCTION
+----------------------------------------------------------------------------------------------------
+-- delete setList
 PUBLIC FUNCTION delSetList(
     l_id SMALLINT ATTRIBUTES(WSParam))
-    ATTRIBUTES(WSGet, WSPath = "/delSetList/{l_id}", WSDescription = "Delete SetList List")
+    ATTRIBUTES(WSGet, WSPath = "/delSetList/{l_id}", WSDescription = "Delete SetList")
     RETURNS STRING
 	DEFINE response RECORD
 		reply STRING

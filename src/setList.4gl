@@ -195,21 +195,30 @@ FUNCTION (this setList) new() RETURNS()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) del(l_server STRING) RETURNS()
+	DEFINE l_ws_stat SMALLINT
+	DEFINE l_ws_reply STRING
+	LET cli_setlist.Endpoint.Address.Uri = l_server
+
+	CALL this.list.clear()
+	LET this.listLen = 0
+	LET this.saved = TRUE
 
 	CALL log.logIt( "Delete setlist Id:"||this.currentListId)
 	IF l_server IS NULL THEN
 		DELETE FROM setlist WHERE id = this.currentListId
 		DELETE FROM setlist_song WHERE setlist_id = this.currentListId
 	ELSE
---TODO: WS call
+		CALL cli_setlist.delSetList(this.currentListId) RETURNING l_ws_stat, l_ws_reply
 	END IF
 	MESSAGE "Setlist Deleted."
-	CALL this.list.clear()
 
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION (this setList) save(l_server STRING)
-	DEFINE x SMALLINT
+	DEFINE x SMALLINT	DEFINE l_ws_stat SMALLINT
+	DEFINE l_ws_reply STRING
+	DEFINE l_post cli_setlist.addSetListRequestBodyType
+	LET cli_setlist.Endpoint.Address.Uri = l_server
 
 	CALL log.logIt( "Saving setlist Id:"||NVL(this.currentListId,"NULL"))
 	IF l_server IS NULL THEN
@@ -222,7 +231,12 @@ FUNCTION (this setList) save(l_server STRING)
 			INSERT INTO setlist_song VALUES( this.currentListId, this.list[x].id, x )
 		END FOR
 	ELSE
---TODO: WS call
+		LET l_post.id = this.currentListId
+		LET l_post.name = this.currentList
+		FOR x = 1 TO this.listLen
+			LET l_post.items[x] = this.list[x].id
+		END FOR
+		CALL cli_setlist.addSetList(l_post.*) RETURNING l_ws_stat, l_ws_reply
 	END IF
 	LET this.saved = TRUE
 	MESSAGE "Setlist Saved."
