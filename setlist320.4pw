@@ -117,7 +117,7 @@
       <File filePath="src/test.4gl"/>
     </Application>
     <Library binaryName="ws_lib" id="1779388776" label="ws_lib">
-      <File filePath="ws_lib/cli_setlist.4gl"/>
+      <File filePath="ws_lib/cli_setlist.openapi"/>
     </Library>
     <Application binaryName="ws_setList" dependencies="-620758080,452154458,1986,1810934636" id="2126940491" label="ws_setList">
       <File filePath="src/ws_setList.4gl"/>
