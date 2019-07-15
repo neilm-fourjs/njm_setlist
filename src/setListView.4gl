@@ -50,15 +50,6 @@ MAIN
 	END DIALOG
 END MAIN
 --------------------------------------------------------------------------------
-FUNCTION cb_setList(l_cb ui.ComboBox)
-	DEFINE x SMALLINT
-	LET m_cb_setlist = l_cb
-	CALL l_cb.clear()
-	FOR x = 1 TO m_setList.arrLen
-		CALL l_cb.addItem( m_setList.arr[x].id, m_setList.arr[x].name )
-	END FOR
-END FUNCTION
---------------------------------------------------------------------------------
 FUNCTION set_mArr()
 	DEFINE x SMALLINT
 	DEFINE l_tot STRING
@@ -71,3 +62,11 @@ FUNCTION set_mArr()
 	DISPLAY lib.sec_to_time(l_tot, TRUE) TO l_tot
 END FUNCTION
 --------------------------------------------------------------------------------
+FUNCTION cb_setList(l_cb ui.ComboBox)
+	DEFINE x SMALLINT
+	LET m_cb_setlist = l_cb
+	CALL l_cb.clear()
+	FOR x = 1 TO m_setList.arrLen
+		CALL l_cb.addItem( m_setList.arr[x].id, m_setList.arr[x].name )
+	END FOR
+END FUNCTION
