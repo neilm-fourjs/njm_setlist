@@ -1,0 +1,36 @@
+
+LAYOUT ( TEXT="Set List", STYLE="main" )
+
+VBOX
+GRID ( STYLE="darkred" )
+{
+[s001                             ][f003 ]
+}
+END -- GRID
+TABLE (STYLE="listView")
+{
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+[f001                  |f002             ]
+}
+END -- TABLE
+END -- VBOX
+
+ATTRIBUTES
+COMBOBOX s001 = FORMONLY.m_setlist_id, INITIALIZER=cb_setlist, NOT NULL;
+f003 = FORMONLY.l_tot;
+
+f001 = FORMONLY.fld1;
+f002 = FORMONLY.fld2;
+
+INSTRUCTIONS
+SCREEN RECORD tab2 ( FORMONLY.fld1 THRU FORMONLY.fld2 )

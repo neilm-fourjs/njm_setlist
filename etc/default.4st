@@ -10,6 +10,10 @@ Property of Four Js*
 -->
 
 <StyleList>
+  <Style name="Table.listView">
+		<StyleAttribute name="tableType" value="listView"/>
+		<StyleAttribute name="reduceFilter" value="no"/>
+  </Style>
   <Style name="Window">
      <StyleAttribute name="windowType" value="normal" />
      <StyleAttribute name="fontSize" value="12pt" />

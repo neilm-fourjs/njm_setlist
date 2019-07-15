@@ -1,0 +1,5 @@
+
+mobile.environment.WSSERVER = "https://generodemos.dynu.net/f/ws/r/ws_setlist/ws_setList/"
+
+# WS
+security.global.ca = "CABundle.pem"
