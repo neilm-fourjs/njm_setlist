@@ -18,6 +18,11 @@ Property of Four Js*
      <StyleAttribute name="windowType" value="normal" />
      <StyleAttribute name="fontSize" value="12pt" />
   </Style>
+
+  <Style name=".small">
+     <StyleAttribute name="fontSize" value="8pt" />
+  </Style>
+
   <Style name="ToolBarItem">
      <StyleAttribute name="fontSize" value="8pt" />
   </Style>
