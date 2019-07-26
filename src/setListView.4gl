@@ -26,6 +26,10 @@ MAIN
 	END IF
 
 	CALL m_songs.get(l_server)
+	IF m_songs.arr.getLength() = 0 THEN
+		CALL fgl_winMessage("Error","Failed to retrieve songlist!","exclamation")
+		EXIT PROGRAM
+	END IF
 	CALL m_setList.get(l_server, m_songs)
 
 	OPEN FORM f FROM "setListView"
@@ -55,8 +59,13 @@ FUNCTION set_mArr()
 	DEFINE l_tot STRING
 	CALL m_arr.clear()
 	FOR x = 1 TO m_setList.listLen
-		LET m_arr[x].fld1 = SFMT("%1 - %2", m_setList.list[x].titl, m_songs.arr[ m_setList.list[x].num ].artist )
-		LET m_arr[x].fld2 = SFMT("%1) %2",x,  m_setList.list[x].tim)
+		IF m_setList.list[x].num IS NULL OR m_setList.list[x].num < 1 THEN
+			LET m_arr[x].fld1 = " *** Break *** "
+		ELSE
+			DISPLAY "x:",x," ", m_setList.list[x].num
+			LET m_arr[x].fld1 = SFMT("%1 - %2", m_setList.list[x].titl, m_songs.arr[ m_setList.list[x].num ].artist )
+			LET m_arr[x].fld2 = SFMT("%1) %2",x,  m_setList.list[x].tim)
+		END IF
 	END FOR
 	CALL m_setList.totals() RETURNING l_tot, x
 	DISPLAY lib.sec_to_time(l_tot, TRUE) TO l_tot

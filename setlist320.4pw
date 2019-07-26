@@ -64,7 +64,7 @@
   </Settings>
   <LanguageList version="1.0"/>
   <PlatformList version="1.0"/>
-  <Group environment="value:WSSERVER=https://generodemos.dynu.net/f/ws/r/ws_setlist/ws_setList/,value:FONTDIR=/home/neilm/fonts,value:FGLPROFILE=../etc/fglprofile.sqt,value:FGLIMAGEPATH=../pics:../pics/image2font.txt" id="-755569125" label="SetList" language="Genero">
+  <Group environment="value:WSSERVER=https://generodemos.dynu.net/g/ws/r/ws_setlist/ws_setList/,value:FONTDIR=/home/neilm/fonts,value:FGLPROFILE=../etc/fglprofile.sqt,value:FGLIMAGEPATH=../pics:../pics/image2font.txt" id="-755569125" label="SetList" language="Genero">
     <Group id="566311272" label="Common" language="Genero">
       <Library binaryName="Databases" id="1986" label="Databases">
         <File filePath="etc/songs.4db"/>
