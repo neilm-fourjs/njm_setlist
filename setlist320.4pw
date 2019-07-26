@@ -121,13 +121,16 @@
     <Group id="1600136315" label="Web" language="Genero">
       <Library binaryName="gas" id="452154458" label="gas">
         <File filePath="gas_deploy/setlist.xcf"/>
+        <File filePath="gas_deploy/setlist2.xcf"/>
         <File filePath="gas_deploy/setlistdb.xcf"/>
+        <File filePath="gas_deploy/setlistView.xcf"/>
         <File filePath="gas_deploy/ws_setlist.xcf"/>
       </Library>
-      <Package binaryName="njm_setlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458,2126940491,2140468318,1779388776,1851630676" description="Gar Package" id="1062761472" label="njm_setlist" platform="Genero Application Server">
+      <Package binaryName="njm_setlist" dependencies="1810934636,1268305552,18736,-620758080,1986,452154458,2126940491,2140468318,1779388776,1851630676,895030646" description="Gar Package" id="1062761472" label="njm_setlist" platform="Genero Application Server">
         <DynamicProperty name="packageId" value="songlist"/>
         <DynamicProperty name="packageLabel" value="songlist"/>
         <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?,*.unl" label="bin" recursive="false" sourceDirectory="$(ProjectDir)/bin"/>
+        <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?,*.unl" label="bin_gm" recursive="false" sourceDirectory="$(ProjectDir)/bin_gm"/>
         <Directory destinationDirectory="$(ProjectDir)/bin/bin" includedFiles="*.42?,*.unl" label="bin_lib" recursive="false" sourceDirectory="$(ProjectDir)/bin_lib"/>
         <Directory destinationDirectory="$(ProjectDir)/bin/db" includedFiles="*.db" label="db" recursive="false" sourceDirectory="$(ProjectDir)/db"/>
         <Directory destinationDirectory="$(ProjectDir)/bin/etc" label="etc" recursive="false" sourceDirectory="$(ProjectDir)/etc"/>

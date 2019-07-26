@@ -10,7 +10,7 @@
 		<ENVIRONMENT_VARIABLE Id="LOGDIR">../../logs</ENVIRONMENT_VARIABLE>
 		<ENVIRONMENT_VARIABLE Id="WSSERVER">https://generodemos.dynu.net/g/ws/r/ws_setlist/ws_setList/</ENVIRONMENT_VARIABLE>
 		<PATH>$(res.app.path)/bin</PATH>
-		<MODULE>setlist320.42r</MODULE>
+		<MODULE>setListView.42r</MODULE>
 	</EXECUTION>
 	<UA_OUTPUT>
 		<PROXY>$(res.uaproxy.cmd)</PROXY>
