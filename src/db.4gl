@@ -41,6 +41,8 @@ FUNCTION connect(l_db)
 	END IF
 	CALL log.logIt( "Connected to DB:"||NVL(m_dbname,"NULL"))
 
+	CALL fix_songSerial()
+	CALL fix_setlistSerial()
 END FUNCTION
 --------------------------------------------------------------------------------
 FUNCTION drop()
@@ -174,19 +176,28 @@ END FUNCTION
 ----------------------------------------------------------------------------------------------------
 FUNCTION load()
 
+	CALL log.logIt("Deleting current data ...")
 	DELETE FROM setlist
 	DELETE FROM setlist_song
 	DELETE FROM setlist_hist
 	DELETE FROM songs
 
+	CALL log.logIt("Load from 'songs.unl' ...")
 	LOAD FROM "songs.unl" INSERT INTO songs
 	CALL fix_songSerial()
 
-	LOAD FROM "setlist.unl" INSERT INTO setlist (id, NAME )
+	CALL log.logIt("Load from 'setlist.unl' ...")
+	LOAD FROM "setlist.unl" INSERT INTO setlist
 	CALL fix_setlistSerial()
 
+	CALL log.logIt("Load from 'setlist_song.unl' ...")
 	LOAD FROM "setlist_song.unl" INSERT INTO setlist_song
-	LOAD FROM "setlist_hist.unl" INSERT INTO setlist_hist
+
+	CALL log.logIt("Load from 'setlist_hist.unl' ...")
+	TRY
+		LOAD FROM "setlist_hist.unl" INSERT INTO setlist_hist
+	CATCH
+	END TRY
 
 	CALL fgl_winMessage("Loads","Data loaded.","information")
 END FUNCTION
@@ -195,7 +206,9 @@ FUNCTION fix_songSerial()
 	DEFINE l_id INTEGER
 	IF m_dbtype = "dbmpgs" THEN
 		SELECT MAX(id) INTO l_id FROM songs
+		IF l_id IS NULL THEN LET l_id = 0 END IF
 		LET l_id = l_id + 1
+		DISPLAY "Fixing serial for songs:",l_id
 		EXECUTE IMMEDIATE "SELECT setval('songs_id_seq', "||l_id||")"
 	END IF
 END FUNCTION
@@ -204,7 +217,9 @@ FUNCTION fix_setlistSerial()
 	DEFINE l_id INTEGER
 	IF m_dbtype = "dbmpgs" THEN
 		SELECT MAX(id) INTO l_id FROM setlist
+		IF l_id IS NULL THEN LET l_id = 0 END IF
 		LET l_id = l_id + 1
+		DISPLAY "Fixing serial for setlist:",l_id
 		EXECUTE IMMEDIATE "SELECT setval('setlist_id_seq', "||l_id||")"
 	END IF
 END FUNCTION
@@ -214,7 +229,7 @@ FUNCTION backup()
 	DEFINE l_dbbackup STRING
 	DEFINE l_tim CHAR(8)
 
-	LET l_dbbackup = os.path.join( os.path.dirname(os.path.pwd()),"db_backup")
+	LET l_dbbackup = "../../db_backup"
 	IF NOT os.path.exists(l_dbbackup) THEN
 		IF NOT os.path.mkdir(l_dbbackup) THEN
 			CALL log.logIt( SFMT("Failed to make backup dir '%1'",l_dbbackup) )
